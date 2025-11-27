@@ -5,7 +5,7 @@
     android:layout_height="wrap_content"
     android:orientation="vertical"
     android:padding="12dp"
-    android:background="#F5F5F5"
+    android:background="@drawable/edit_text_background"
     android:layout_marginBottom="8dp"> <!-- Her eleman arasına boşluk -->
 
     <!-- Üst Satır: İkon, Başlık ve Zaman -->

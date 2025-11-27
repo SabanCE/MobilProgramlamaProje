@@ -129,6 +129,8 @@
         android:layout_height="0dp"
         android:layout_weight="1"
         android:layout_marginTop="8dp"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
         tools:listitem="@layout/item_notification" />
 
     <!-- Alt Navigasyon Çubuğu -->
