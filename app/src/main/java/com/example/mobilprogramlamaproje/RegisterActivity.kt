@@ -30,8 +30,8 @@ class RegisterActivity : AppCompatActivity() {
             val nameSurname = binding.nameSurnameInput.text.toString().trim()
             val email = binding.emailInput.text.toString().trim()
             val password = binding.passwordInput.text.toString().trim()
-            val role = binding.birimInput.text.toString().trim()
-            val unit = "user" // Varsayılan birim değeri
+            val unit = binding.birimInput.text.toString().trim()
+            val role = "user" // Varsayılan birim değeri
 
 
 

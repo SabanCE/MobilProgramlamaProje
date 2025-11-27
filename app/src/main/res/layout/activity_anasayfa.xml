@@ -1,19 +1,144 @@
-<?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<?xml version="1.0" encoding="utf-8"?><!-- Ana Kapsayıcı: Dikey LinearLayout -->
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@drawable/gradient_background"
     tools:context=".AnasayfaActivity">
 
-    <Button
-        android:id="@+id/cikisyapButon"
+    <!-- Arama Bölümü - androidx versiyonu ile güncellendi -->
+    <androidx.appcompat.widget.SearchView
+        android:id="@+id/search_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="12dp"
+        android:queryHint="Bildirimlerde ara..."
+        android:background="@drawable/edit_text_background" />
+
+    <!-- Filtreler Başlığı -->
+    <TextView
+        android:id="@+id/filter_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Button"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-</androidx.constraintlayout.widget.ConstraintLayout>
+        android:layout_marginStart="12dp"
+        android:text="Filtreler:"
+        android:textStyle="bold" />
+
+    <!-- Filtre Chipleri -->
+    <HorizontalScrollView
+        android:id="@+id/filter_scroll"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:scrollbars="none">
+
+        <com.google.android.material.chip.ChipGroup
+            android:id="@+id/status_filter_chip_group"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingStart="12dp"
+            android:paddingEnd="12dp"
+            app:singleSelection="true">
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chip_tum_u"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Tümü" />
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chip_acik"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Açık" />
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chip_takip_ettiklerim"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Takip Ettiklerim" />
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chip_admin_panel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Yetki Alanım" />
+        </com.google.android.material.chip.ChipGroup>
+    </HorizontalScrollView>
+
+    <!-- Tür Başlığı -->
+    <TextView
+        android:id="@+id/type_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="12dp"
+        android:layout_marginTop="8dp"
+        android:text="Tür:"
+        android:textStyle="bold" />
+
+    <!-- Tür Chipleri -->
+    <HorizontalScrollView
+        android:id="@+id/type_scroll"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:scrollbars="none">
+
+        <com.google.android.material.chip.ChipGroup
+            android:id="@+id/type_filter_chip_group"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingStart="12dp"
+            android:paddingEnd="12dp"
+            app:singleSelection="true">
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chip_hepsi"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Hepsi" />
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chip_saglik"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Sağlık" />
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chip_guvenlik"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Güvenlik" />
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chip_cevre"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Çevre" />
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chip_kayip"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Kayıp" />
+        </com.google.android.material.chip.ChipGroup>
+    </HorizontalScrollView>
+
+    <!-- Bildirim Listesi -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/notifications_recycler_view"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:layout_marginTop="8dp"
+        tools:listitem="@layout/item_notification" />
+
+    <!-- Alt Navigasyon Çubuğu -->
+    <com.google.android.material.bottomnavigation.BottomNavigationView
+        android:id="@+id/bottom_navigation"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/gradient_background"
+        app:itemTextColor="#333333"
+        app:itemIconTint="#555555"
+        app:menu="@menu/bottom_nav_menu" />
+
+</LinearLayout>
