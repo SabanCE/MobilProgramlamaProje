@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?><LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="12dp"
+    android:background="#F5F5F5"
+    android:layout_marginBottom="8dp"> <!-- Her eleman arasına boşluk -->
+
+    <!-- Üst Satır: İkon, Başlık ve Zaman -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"> <!-- Dikey olarak ortalamak için -->
+
+        <!-- Tür İkonu  -->
+        <ImageView
+            android:id="@+id/icon_notification_type"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_marginEnd="8dp"
+            tools:src="@android:drawable/ic_dialog_alert" />
+
+        <!-- Başlık -->
+        <TextView
+            android:id="@+id/text_notification_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:textColor="#000000"
+            tools:text="Bildirim Başlığı" />
+
+        <!-- Esnek Boşluk: Zamanı sağa iter -->
+        <View
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_weight="1" />
+
+        <!-- Zaman Bilgisi (Oluşturulma Zamanı) -->
+        <TextView
+            android:id="@+id/text_notification_time"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="12sp"
+            tools:text="1 saat önce" />
+
+    </LinearLayout>
+
+    <!-- Açıklama Metni -->
+    <TextView
+        android:id="@+id/text_notification_description"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:textSize="14sp"
+        tools:text="Bu kısımda bildirimin açıklaması yer alacak. Birkaç satır olabilir." />
+
+    <!-- Alt Satır: Durum Bilgisi (Açık/İnceleniyor/Çözüldü) -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="10dp">
+
+        <!-- Esnek Boşluk: Durumu sağa iter -->
+        <View
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_weight="1" />
+
+        <!-- Durum Etiketi -->
+        <TextView
+            android:id="@+id/chip_notification_status"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="#808080"
+            android:padding="6dp"
+            android:textColor="#FFFFFF"
+            android:textStyle="bold"
+            tools:text="Açık" />
+
+    </LinearLayout>
+
+</LinearLayout>
