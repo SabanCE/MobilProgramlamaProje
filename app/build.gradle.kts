@@ -55,4 +55,5 @@ dependencies {
     implementation("com.google.firebase:firebase-firestore-ktx") // kayıt ol daki diğer verileri de eklemek için email,pass hariç
     implementation(platform("com.google.firebase:firebase-bom:33.1.2")) //firebase
     implementation("com.google.firebase:firebase-analytics") //firebase bağlanmak için
+    implementation("com.google.android.gms:play-services-maps:18.2.0")// Map için gerekli api
 }

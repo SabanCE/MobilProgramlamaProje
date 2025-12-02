@@ -1,5 +1,5 @@
 package com.example.mobilprogramlamaproje
-
+//Eposta yenileme sayfası
 import android.os.Bundle
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity

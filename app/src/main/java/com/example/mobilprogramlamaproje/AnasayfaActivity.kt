@@ -9,12 +9,13 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.mobilprogramlamaproje.databinding.ActivityAnasayfaBinding
-import com.google.android.material.chip.Chip
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.Query
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
+import kotlin.jvm.java
+
 
 class AnasayfaActivity : AppCompatActivity() {
     private lateinit var binding: ActivityAnasayfaBinding
@@ -120,31 +121,7 @@ class AnasayfaActivity : AppCompatActivity() {
             }
     }
 
-    private fun bildirimEkle() {
-        Log.d(TAG, "bildirimEkle başladı.")
-        // ... fonksiyon içeriği aynı ...
-        val db = Firebase.firestore
-        val currentUser = auth.currentUser ?: return
 
-        val notificationData = hashMapOf(
-            "title" to "Yeni Test Bildirimi",
-            "description" to "Bu bildirim, 'Oluştur' butonuna basılarak eklendi.",
-            "type" to "Genel",
-            "status" to "Açık",
-            "authorId" to currentUser.uid,
-            "timestamp" to com.google.firebase.Timestamp.now()
-        )
-
-        db.collection("notifications")
-            .add(notificationData)
-            .addOnSuccessListener {
-                Toast.makeText(this, "Test bildirimi eklendi!", Toast.LENGTH_SHORT).show()
-                verileriYukle() // Ekleme başarılı olunca listeyi yenile
-            }
-            .addOnFailureListener { e ->
-                Toast.makeText(this, "Hata: ${e.message}", Toast.LENGTH_SHORT).show()
-            }
-    }
 
     private fun listeyiGuncelle() {
         Log.d(
@@ -157,11 +134,14 @@ class AnasayfaActivity : AppCompatActivity() {
 
         // 1. Arama Metnine Göre Filtrele
         if (mevcutAramaMetni.isNotEmpty()) {
-            filtrelenmisListe = filtrelenmisListe.filter { bildirim ->
-                bildirim.title.contains(mevcutAramaMetni, ignoreCase = true) ||
-                        bildirim.description.contains(mevcutAramaMetni, ignoreCase = true)
-            } as ArrayList<Notification>
+            filtrelenmisListe = ArrayList(
+                filtrelenmisListe.filter { bildirim ->
+                    (bildirim.title ?: "").contains(mevcutAramaMetni, ignoreCase = true) ||
+                            (bildirim.description ?: "").contains(mevcutAramaMetni, ignoreCase = true)
+                }
+            )
         }
+
 
         // 2. Duruma Göre Filtrele (Eğer "Tümü" seçili değilse)
         if (mevcutDurumFiltresi != "Tümü") {
@@ -184,7 +164,6 @@ class AnasayfaActivity : AppCompatActivity() {
 
 
     private fun setupRecyclerView() {
-        Log.d(TAG, "setupRecyclerView çalıştı.")
         notificationsAdapter = NotificationsAdapter(ArrayList())
         binding.notificationsRecyclerView.layoutManager = LinearLayoutManager(this)
         binding.notificationsRecyclerView.adapter = notificationsAdapter
@@ -207,52 +186,43 @@ class AnasayfaActivity : AppCompatActivity() {
         binding.chipTumU.setOnClickListener {
             mevcutDurumFiltresi = "Tümü"
             listeyiGuncelle()
-            Log.d(TAG, "Filtre: Tümü seçildi")
         }
         binding.chipAcik.setOnClickListener {
             mevcutDurumFiltresi = "Açık"
             listeyiGuncelle()
-            Log.d(TAG, "Filtre: Açık seçildi")
         }
         binding.chipTakipEttiklerim.setOnClickListener {
-            // Bu filtrenin çalışması için veritabanı sorgusunu da değiştirmek gerekebilir.
-            // Şimdilik sadece değişkeni ayarlıyoruz.
             mevcutDurumFiltresi = "Takip Ettiklerim"
             listeyiGuncelle()
-            Log.d(TAG, "Filtre: Takip Ettiklerim seçildi")
         }
         binding.chipAdminPanel.setOnClickListener {
-            // Bu filtre için özel mantık gerekebilir.
+
             mevcutDurumFiltresi = "Yetki Alanım"
             listeyiGuncelle()
-            Log.d(TAG, "Filtre: Yetki Alanım seçildi")
         }
 
         // 2. Tür Filtreleri
         binding.chipHepsi.setOnClickListener {
             mevcutTurFiltresi = "Hepsi"
             listeyiGuncelle()
-            Log.d(TAG, "Filtre: Hepsi seçildi")
         }
         binding.chipSaglik.setOnClickListener {
             mevcutTurFiltresi = "Sağlık"
             listeyiGuncelle()
-            Log.d(TAG, "Filtre: Sağlık seçildi")
         }
         binding.chipGuvenlik.setOnClickListener {
             mevcutTurFiltresi = "Güvenlik"
             listeyiGuncelle()
-            Log.d(TAG, "Filtre: Güvenlik seçildi")
         }
         binding.chipCevre.setOnClickListener {
             mevcutTurFiltresi = "Çevre"
             listeyiGuncelle()
-            Log.d(TAG, "Filtre: Çevre seçildi")
         }
         binding.chipKayip.setOnClickListener {
             mevcutTurFiltresi = "Kayıp"
             listeyiGuncelle()
-            Log.d(TAG, "Filtre: Kayıp seçildi")
+
+        }
 
 
             // Bottom Navigation Bar yönlendirmeleri
@@ -262,8 +232,13 @@ class AnasayfaActivity : AppCompatActivity() {
                     R.id.nav_map -> {
                         Toast.makeText(this, "Harita Sayfası açılıyor...", Toast.LENGTH_SHORT)
                             .show()
+                        val intent = Intent(this, MapsActivity::class.java)
+                        startActivity(intent)
+                        finish()
                         true
                     }
+
+
 
                     R.id.nav_create -> {
                         bildirimEkle()
@@ -290,4 +265,8 @@ class AnasayfaActivity : AppCompatActivity() {
             }
         }
     }
+
+private fun AnasayfaActivity.bildirimEkle() {
+    TODO("Not yet implemented")
 }
+
