@@ -19,6 +19,6 @@ data class Notification(
     val latitude: Double? = null,
     val longitude: Double? = null,
     val imageUrl: String? = null,
-    // YENİ: Bildirimi takip eden kullanıcıların ID listesi
-    val followers: List<String> = emptyList()
+    // Takipçiler listesi artık "var" olarak tanımlandı
+    var followers: List<String> = emptyList()
 )

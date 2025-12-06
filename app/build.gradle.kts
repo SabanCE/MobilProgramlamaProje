@@ -56,4 +56,7 @@ dependencies {
     implementation(platform("com.google.firebase:firebase-bom:33.1.2")) //firebase
     implementation("com.google.firebase:firebase-analytics") //firebase bağlanmak için
     implementation("com.google.android.gms:play-services-maps:18.2.0")// Map için gerekli api
+    implementation("com.google.android.gms:play-services-location:21.3.0") // Konum servisleri için
+    implementation("com.google.firebase:firebase-storage-ktx") // Firebase Storage için
+    implementation("com.github.bumptech.glide:glide:4.16.0")
 }

@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/gradient_background"
+    android:padding="16dp"
+    tools:context=".BildirimEkleActivity">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <TextView
+            style="@style/TextAppearance.AppCompat.Title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:text="Yeni Bildirim Oluştur"
+            android:textColor="@android:color/black"
+            android:textStyle="bold" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="Tür Seçimi"
+            android:textColor="@android:color/black"
+            android:textStyle="bold" />
+
+        <Spinner
+            android:id="@+id/spinner_tur"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:background="@drawable/edit_text_background"
+            android:entries="@array/yeni_tur_array"
+            android:paddingStart="12dp"
+            android:paddingEnd="12dp"/>
+
+        <EditText
+            android:id="@+id/et_baslik"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_marginTop="16dp"
+            android:background="@drawable/edit_text_background"
+            android:hint="Başlık"
+            android:paddingStart="12dp"
+            android:paddingEnd="12dp"/>
+
+        <EditText
+            android:id="@+id/et_aciklama"
+            android:layout_width="match_parent"
+            android:layout_height="100dp"
+            android:layout_marginTop="8dp"
+            android:background="@drawable/edit_text_background"
+            android:gravity="top"
+            android:hint="Açıklama"
+            android:inputType="textMultiLine"
+            android:paddingStart="12dp"
+            android:paddingEnd="12dp"
+            android:paddingTop="8dp"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="Konum Seçimi"
+            android:textColor="@android:color/black"
+            android:textStyle="bold" />
+
+        <Button
+            android:id="@+id/btn_cihaz_konumu"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:background="@drawable/edit_text_background"
+            android:text="Cihaz Konumunu Kullan" />
+
+        <Button
+            android:id="@+id/btn_harita_konumu"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:background="@drawable/edit_text_background"
+            android:text="Haritadan Seç" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="Fotoğraf (Opsiyonel)"
+            android:textColor="@android:color/black"
+            android:textStyle="bold" />
+
+        <Button
+            android:id="@+id/btn_fotograf_ekle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:background="@drawable/edit_text_background"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            android:text="Fotoğraf Ekle" />
+
+        <FrameLayout
+            android:id="@+id/fl_onizleme_container"
+            android:layout_width="match_parent"
+            android:layout_height="200dp"
+            android:layout_marginTop="8dp"
+            android:visibility="gone">
+
+            <ImageView
+                android:id="@+id/iv_onizleme"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@drawable/edit_text_background"
+                android:scaleType="centerCrop" />
+
+            <ImageButton
+                android:id="@+id/btn_kaldir_foto"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_gravity="top|end"
+                android:background="@android:drawable/ic_delete" />
+
+        </FrameLayout>
+
+        <ProgressBar
+            android:id="@+id/progress_bar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="16dp"
+            android:visibility="gone"/>
+
+        <Button
+            android:id="@+id/btn_gonder"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:background="@drawable/edit_text_background"
+            android:text="Bildirimi Oluştur"
+            android:textStyle="bold" />
+
+    </LinearLayout>
+</ScrollView>

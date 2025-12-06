@@ -3,7 +3,13 @@
     <style name="Base.Theme.MobilProgramlamaProje" parent="Theme.Material3.DayNight.NoActionBar">
         <!-- Customize your light theme here. -->
         <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
+        <item name="chipStyle">@style/CustomChipStyle</item>
     </style>
 
     <style name="Theme.MobilProgramlamaProje" parent="Base.Theme.MobilProgramlamaProje" />
+
+    <style name="CustomChipStyle" parent="Widget.Material3.Chip.Filter">
+        <item name="chipBackgroundColor">@color/chip_background_color</item>
+        <item name="android:textColor">@color/chip_text_color</item>
+    </style>
 </resources>

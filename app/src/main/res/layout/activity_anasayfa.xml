@@ -40,85 +40,46 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:paddingStart="12dp"
-            android:paddingEnd="12dp"
-            app:singleSelection="true">
+            android:paddingEnd="12dp">
 
             <com.google.android.material.chip.Chip
                 android:id="@+id/chip_tum_u"
+                style="@style/Widget.MaterialComponents.Chip.Choice"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Tümü" />
+                android:text="Tümü"
+                app:chipBackgroundColor="@color/chip_background_color"
+                android:checkable="true"
+                android:checked="true"/>
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chip_tur_filter"
+                style="@style/Widget.MaterialComponents.Chip.Choice"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:chipBackgroundColor="@color/chip_background_color"
+                android:checkable="true"
+                android:checked="true"
+                android:text="Tüm Türler" />
 
             <com.google.android.material.chip.Chip
                 android:id="@+id/chip_acik"
+                style="@style/Widget.MaterialComponents.Chip.Choice"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                app:chipBackgroundColor="@color/chip_background_color"
+                android:checkable="true"
                 android:text="Açık" />
 
             <com.google.android.material.chip.Chip
                 android:id="@+id/chip_takip_ettiklerim"
+                style="@style/Widget.MaterialComponents.Chip.Choice"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                app:chipBackgroundColor="@color/chip_background_color"
+                android:checkable="true"
                 android:text="Takip Ettiklerim" />
 
-            <com.google.android.material.chip.Chip
-                android:id="@+id/chip_admin_panel"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Yetki Alanım" />
-        </com.google.android.material.chip.ChipGroup>
-    </HorizontalScrollView>
-
-    <!-- Tür Başlığı -->
-    <TextView
-        android:id="@+id/type_title"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="12dp"
-        android:layout_marginTop="8dp"
-        android:text="Tür:"
-        android:textStyle="bold" />
-
-    <!-- Tür Chipleri -->
-    <HorizontalScrollView
-        android:id="@+id/type_scroll"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:scrollbars="none">
-
-        <com.google.android.material.chip.ChipGroup
-            android:id="@+id/type_filter_chip_group"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:paddingStart="12dp"
-            android:paddingEnd="12dp"
-            app:singleSelection="true">
-
-            <com.google.android.material.chip.Chip
-                android:id="@+id/chip_hepsi"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Hepsi" />
-            <com.google.android.material.chip.Chip
-                android:id="@+id/chip_saglik"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Sağlık" />
-            <com.google.android.material.chip.Chip
-                android:id="@+id/chip_guvenlik"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Güvenlik" />
-            <com.google.android.material.chip.Chip
-                android:id="@+id/chip_cevre"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Çevre" />
-            <com.google.android.material.chip.Chip
-                android:id="@+id/chip_kayip"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Kayıp" />
         </com.google.android.material.chip.ChipGroup>
     </HorizontalScrollView>
 

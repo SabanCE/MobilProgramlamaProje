@@ -1,3 +1,18 @@
 <resources>
     <string name="app_name">MobilProgramlamaProje</string>
+    <string-array name="tur_array">
+        <item>Tüm Türler</item>
+        <item>Sağlık</item>
+        <item>Güvenlik</item>
+        <item>Çevre</item>
+        <item>Kayıp-Buluntu</item>
+        <item>Teknik Arıza</item>
+    </string-array>
+    <string-array name="yeni_tur_array">
+        <item>Sağlık</item>
+        <item>Güvenlik</item>
+        <item>Çevre</item>
+        <item>Kayıp-Buluntu</item>
+        <item>Teknik Arıza</item>
+    </string-array>
 </resources>

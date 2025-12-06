@@ -3,19 +3,17 @@ package com.example.mobilprogramlamaproje
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
-import android.view.View
-import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.mobilprogramlamaproje.databinding.ActivityAnasayfaBinding
+import com.google.android.material.chip.Chip
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.Query
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
-import kotlin.jvm.java
-
 
 class AnasayfaActivity : AppCompatActivity() {
     private lateinit var binding: ActivityAnasayfaBinding
@@ -23,145 +21,80 @@ class AnasayfaActivity : AppCompatActivity() {
     private lateinit var notificationsAdapter: NotificationsAdapter
     private var tumBildirimlerListesi = ArrayList<Notification>()
 
-    // Filtreleme ve sıralama durumları
-    private var mevcutSiralama = Query.Direction.DESCENDING
-    private var mevcutAramaMetni = ""
-    private var mevcutDurumFiltresi = "Tümü"
-    private var mevcutTurFiltresi = "Hepsi"
-
-    // Hata ayıklama için bir etiket (TAG)
     private val TAG = "AnasayfaActivity_DEBUG"
+    private var isUpdatingChipsProgrammatically = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityAnasayfaBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        Log.d(TAG, "onCreate başladı.")
-
         auth = Firebase.auth
         setupRecyclerView()
         setupListeners()
-
-        // ÖNCE rolü kontrol et, SONRA verileri yükle
-        checkUserRole()
-        verileriYukle()
-
-        Log.d(TAG, "onCreate bitti.")
     }
 
-
-    private fun checkUserRole() {
-        Log.d(TAG, "checkUserRole başladı.")
-        val currentUser = auth.currentUser ?: run {
-            Log.e(TAG, "Kullanıcı null, checkUserRole'dan çıkılıyor.")
-            return
-        }
-
-        try {
-            val adminMenuItem = binding.bottomNavigation.menu.findItem(R.id.nav_admin_paneli)
-            adminMenuItem?.isVisible = false // Başlangıçta gizle
-
-            val db = Firebase.firestore
-            val userDocRef = db.collection("users").document(currentUser.uid)
-
-            userDocRef.get().addOnSuccessListener { document ->
-                Log.d(TAG, "Kullanıcı rolü sorgusu başarılı.")
-                if (document != null && document.exists()) {
-                    if (document.getString("role") == "admin") {
-                        Log.d(TAG, "Kullanıcı bir admin. Butonlar görünür yapılıyor.")
-                        binding.chipAdminPanel.visibility = View.VISIBLE
-                        adminMenuItem?.isVisible = true
-                    }
-                } else {
-                    Log.w(TAG, "Kullanıcı dökümanı bulunamadı.")
-                }
-            }.addOnFailureListener {
-                Log.e(TAG, "Kullanıcı rolü sorgusu başarısız.", it)
-            }
-
-        } catch (e: Exception) {
-            // Eğer ID YANLIŞSA, uygulama burada çökmek yerine logcat'e hata yazacak.
-            Log.e(
-                TAG,
-                "checkUserRole içinde menü ID'si bulunurken hata oluştu! ID yanlış olabilir.",
-                e
-            )
-            Toast.makeText(this, "Kritik Hata: Admin menüsü bulunamadı.", Toast.LENGTH_LONG).show()
-        }
+    override fun onResume() {
+        super.onResume()
+        verileriYukle()
+        binding.bottomNavigation.selectedItemId = R.id.nav_home
     }
 
     private fun verileriYukle() {
-        Log.d(TAG, "verileriYukle başladı.")
-        val db = Firebase.firestore
-        db.collection("notifications").orderBy("timestamp", mevcutSiralama)
+        Firebase.firestore.collection("notifications").orderBy("timestamp", Query.Direction.DESCENDING)
             .get()
             .addOnSuccessListener { documents ->
-                Log.d(TAG, "Veritabanından ${documents.size()} adet döküman başarıyla çekildi.")
                 tumBildirimlerListesi.clear()
                 for (document in documents) {
-                    try {
-                        val notification = document.toObject(Notification::class.java)
-                        notification.id = document.id
-                        tumBildirimlerListesi.add(notification)
-                    } catch (e: Exception) {
-                        Log.e(TAG, "Döküman Notification nesnesine çevrilirken hata!", e)
+                    document.toObject(Notification::class.java)?.let { 
+                        it.id = document.id
+                        tumBildirimlerListesi.add(it) 
                     }
                 }
                 listeyiGuncelle()
-                Toast.makeText(
-                    this,
-                    "${tumBildirimlerListesi.size} bildirim listeye eklendi.",
-                    Toast.LENGTH_SHORT
-                ).show()
-            }
-            .addOnFailureListener { exception ->
-                Log.e(TAG, "Veritabanı sorgusu başarısız oldu.", exception)
-                Toast.makeText(this, "Veritabanı hatası: ${exception.message}", Toast.LENGTH_LONG)
-                    .show()
             }
     }
-
-
 
     private fun listeyiGuncelle() {
-        Log.d(
-            TAG,
-            "listeyiGuncelle çalıştı. Durum: '$mevcutDurumFiltresi', Tür: '$mevcutTurFiltresi', Arama: '$mevcutAramaMetni'"
-        )
+        val aramaMetni = binding.searchView.query.toString()
+        val isAcikSecili = binding.chipAcik.isChecked
+        val isTakipSecili = binding.chipTakipEttiklerim.isChecked
+        val turFiltresi = binding.chipTurFilter.text.toString()
+        val currentUserId = auth.currentUser?.uid
 
-        // Filtrelemeye her zaman ana listeden başla
-        var filtrelenmisListe = tumBildirimlerListesi
+        var filtrelenmisListe = tumBildirimlerListesi.toList()
 
-        // 1. Arama Metnine Göre Filtrele
-        if (mevcutAramaMetni.isNotEmpty()) {
-            filtrelenmisListe = ArrayList(
-                filtrelenmisListe.filter { bildirim ->
-                    (bildirim.title ?: "").contains(mevcutAramaMetni, ignoreCase = true) ||
-                            (bildirim.description ?: "").contains(mevcutAramaMetni, ignoreCase = true)
+        if (!binding.chipTumU.isChecked) {
+            if (isAcikSecili) {
+                filtrelenmisListe = filtrelenmisListe.filter { it.status.equals("Açık", ignoreCase = true) }
+            }
+            if (isTakipSecili) {
+                if (currentUserId != null) {
+                    filtrelenmisListe = filtrelenmisListe.filter { it.followers.contains(currentUserId) }
+                } else {
+                    filtrelenmisListe = emptyList()
                 }
-            )
+            }
+            if (turFiltresi != "Tüm Türler") {
+                filtrelenmisListe = filtrelenmisListe.filter { it.type.equals(turFiltresi, ignoreCase = true) }
+            }
         }
 
-
-        // 2. Duruma Göre Filtrele (Eğer "Tümü" seçili değilse)
-        if (mevcutDurumFiltresi != "Tümü") {
+        if (aramaMetni.isNotEmpty()) {
+            val aramaKelimeleri = aramaMetni.split(' ').filter { it.isNotBlank() }
             filtrelenmisListe = filtrelenmisListe.filter { bildirim ->
-                bildirim.status.equals(mevcutDurumFiltresi, ignoreCase = true)
-            } as ArrayList<Notification>
+                val birlesikMetin = "${bildirim.title.orEmpty()} ${bildirim.description.orEmpty()}"
+                val metinKelimeleri = birlesikMetin.split(' ')
+                
+                aramaKelimeleri.all { aramaKelimesi ->
+                    metinKelimeleri.any { metinKelimesi ->
+                        metinKelimesi.startsWith(aramaKelimesi, ignoreCase = true)
+                    }
+                }
+            }
         }
 
-        // 3. Türe Göre Filtrele (Eğer "Hepsi" seçili değilse)
-        if (mevcutTurFiltresi != "Hepsi") {
-            filtrelenmisListe = filtrelenmisListe.filter { bildirim ->
-                bildirim.type.equals(mevcutTurFiltresi, ignoreCase = true)
-            } as ArrayList<Notification>
-        }
-
-        // Sonuçları adapter'a gönder
-        notificationsAdapter.updateList(filtrelenmisListe)
-        Log.d(TAG, "Adapter güncellendi. Gösterilen eleman sayısı: ${filtrelenmisListe.size}")
+        notificationsAdapter.updateList(ArrayList(filtrelenmisListe))
     }
-
 
     private fun setupRecyclerView() {
         notificationsAdapter = NotificationsAdapter(ArrayList())
@@ -170,103 +103,81 @@ class AnasayfaActivity : AppCompatActivity() {
     }
 
     private fun setupListeners() {
-        Log.d(TAG, "setupListeners çalıştı.")
-        // Arama çubuğunu (SearchView) dinle
         binding.searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String?): Boolean = false
             override fun onQueryTextChange(newText: String?): Boolean {
-                mevcutAramaMetni = newText.orEmpty()
                 listeyiGuncelle()
                 return true
             }
         })
 
-        // Filtreleri dinle
-        // 1. Durum Filtreleri
-        binding.chipTumU.setOnClickListener {
-            mevcutDurumFiltresi = "Tümü"
-            listeyiGuncelle()
-        }
-        binding.chipAcik.setOnClickListener {
-            mevcutDurumFiltresi = "Açık"
-            listeyiGuncelle()
-        }
-        binding.chipTakipEttiklerim.setOnClickListener {
-            mevcutDurumFiltresi = "Takip Ettiklerim"
-            listeyiGuncelle()
-        }
-        binding.chipAdminPanel.setOnClickListener {
-
-            mevcutDurumFiltresi = "Yetki Alanım"
+        fun syncFilters() {
+            if (isUpdatingChipsProgrammatically) return
+            val isAnySpecialFilterActive = binding.chipAcik.isChecked || binding.chipTakipEttiklerim.isChecked || binding.chipTurFilter.text.toString() != "Tüm Türler"
+            
+            isUpdatingChipsProgrammatically = true
+            binding.chipTumU.isChecked = !isAnySpecialFilterActive
+            isUpdatingChipsProgrammatically = false
+            
             listeyiGuncelle()
         }
 
-        // 2. Tür Filtreleri
-        binding.chipHepsi.setOnClickListener {
-            mevcutTurFiltresi = "Hepsi"
+        binding.chipTumU.setOnClickListener { chip ->
+             if (isUpdatingChipsProgrammatically) return@setOnClickListener
+            
+            isUpdatingChipsProgrammatically = true
+            binding.chipAcik.isChecked = false
+            binding.chipTakipEttiklerim.isChecked = false
+            binding.chipTurFilter.text = "Tüm Türler"
+            (chip as Chip).isChecked = true
+            isUpdatingChipsProgrammatically = false
+
             listeyiGuncelle()
         }
-        binding.chipSaglik.setOnClickListener {
-            mevcutTurFiltresi = "Sağlık"
-            listeyiGuncelle()
-        }
-        binding.chipGuvenlik.setOnClickListener {
-            mevcutTurFiltresi = "Güvenlik"
-            listeyiGuncelle()
-        }
-        binding.chipCevre.setOnClickListener {
-            mevcutTurFiltresi = "Çevre"
-            listeyiGuncelle()
-        }
-        binding.chipKayip.setOnClickListener {
-            mevcutTurFiltresi = "Kayıp"
-            listeyiGuncelle()
 
-        }
+        binding.chipAcik.setOnCheckedChangeListener { _, _ ->  if (!isUpdatingChipsProgrammatically) syncFilters() }
+        binding.chipTakipEttiklerim.setOnCheckedChangeListener { _, _ -> if (!isUpdatingChipsProgrammatically) syncFilters() }
 
-
-            // Bottom Navigation Bar yönlendirmeleri
-            binding.bottomNavigation.setOnItemSelectedListener { item ->
-                when (item.itemId) {
-                    R.id.nav_home -> true // Zaten buradayız
-                    R.id.nav_map -> {
-                        Toast.makeText(this, "Harita Sayfası açılıyor...", Toast.LENGTH_SHORT)
-                            .show()
-                        val intent = Intent(this, MapsActivity::class.java)
-                        startActivity(intent)
-                        finish()
-                        true
-                    }
-
-
-
-                    R.id.nav_create -> {
-                        bildirimEkle()
-                        true
-                    }
-
-                    R.id.nav_profile -> {
-                        auth.signOut()
-                        val intent = Intent(this, MainActivity::class.java)
-                        intent.flags =
-                            Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-                        startActivity(intent)
-                        finish()
-                        true
-                    }
-                    // ID'nin 'nav_admin_paneli' olduğundan emin olarak devam ediyoruz.
-                    R.id.nav_admin_paneli -> {
-                        Toast.makeText(this, "Admin Paneli açılıyor...", Toast.LENGTH_SHORT).show()
-                        true
-                    }
-
-                    else -> false
+        binding.chipTurFilter.setOnClickListener { chip ->
+            (chip as Chip).isChecked = true // Rengi her zaman aktif tut
+            val turler = resources.getStringArray(R.array.tur_array)
+            AlertDialog.Builder(this)
+                .setTitle("Tür Seçin")
+                .setItems(turler) { _, which ->
+                    binding.chipTurFilter.text = turler[which]
+                    syncFilters()
                 }
+                .setOnDismissListener { 
+                     (chip as Chip).isChecked = true 
+                }
+                .show()
+        }
+
+        binding.bottomNavigation.setOnItemSelectedListener { item ->
+            when (item.itemId) {
+                R.id.nav_home -> true
+                R.id.nav_map -> {
+                    startActivity(Intent(this, MapsActivity::class.java))
+                    true
+                }
+                R.id.nav_create -> { 
+                    startActivity(Intent(this, BildirimEkleActivity::class.java))
+                    true 
+                }
+                R.id.nav_profile -> {
+                    auth.signOut()
+                    startActivity(Intent(this, MainActivity::class.java).apply {
+                        flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                    })
+                    finish()
+                    true
+                }
+                R.id.nav_admin_paneli -> {
+                    // TODO: Admin paneli aktivitesini başlat
+                    true
+                }
+                else -> false
             }
         }
     }
-
-private fun AnasayfaActivity.bildirimEkle() {
-    TODO("Not yet implemented")
 }
-
