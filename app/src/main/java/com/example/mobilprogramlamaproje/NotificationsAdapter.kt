@@ -16,44 +16,39 @@ class NotificationsAdapter(private var notificationList: ArrayList<Notification>
         return NotificationViewHolder(binding)
     }
 
-    // *** DEĞİŞİKLİK VE ÇÖZÜM BU FONKSİYONUN İÇİNDE ***
     override fun onBindViewHolder(holder: NotificationViewHolder, position: Int) {
         val currentNotification = notificationList[position]
 
-        // Metinleri ata (bu kısımlar zaten doğru)
         holder.binding.textNotificationTitle.text = currentNotification.title
         holder.binding.textNotificationDescription.text = currentNotification.description
         holder.binding.chipNotificationStatus.text = currentNotification.status
 
-        // Zamanı formatla (bu kısım da doğru)
         currentNotification.timestamp?.let { timestamp ->
             val sdf = SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault())
             holder.binding.textNotificationTime.text = sdf.format(timestamp.toDate())
         }
 
-        // --- YENİ EKLENEN VE İŞİ YAPAN KISIM ---
-        // Bildirimin 'type' alanına göre doğru ikonu seç ve ata.
         when (currentNotification.type) {
             "Sağlık" -> {
-                holder.binding.iconNotificationType.setImageResource(R.drawable.ic_health) // Sağlık ikonu
+                holder.binding.iconNotificationType.setImageResource(R.drawable.ic_health)
             }
             "Güvenlik" -> {
-                holder.binding.iconNotificationType.setImageResource(R.drawable.ic_security) // Güvenlik ikonu
+                holder.binding.iconNotificationType.setImageResource(R.drawable.ic_security)
             }
             "Çevre" -> {
-                holder.binding.iconNotificationType.setImageResource(R.drawable.ic_environment) // Çevre ikonu
+                holder.binding.iconNotificationType.setImageResource(R.drawable.ic_environment)
             }
-            "Kayıp" -> {
-                holder.binding.iconNotificationType.setImageResource(R.drawable.ic_loss) // Kayıp ikonu
+            "Kayıp-Buluntu" -> {
+                holder.binding.iconNotificationType.setImageResource(R.drawable.ic_kayip_buluntu) 
+            }
+            "Teknik Arıza" -> {
+                holder.binding.iconNotificationType.setImageResource(R.drawable.ic_teknik_ariza)
             }
             else -> {
-                // Eğer bilmediğimiz bir tür gelirse veya tür boşsa, varsayılan bir ikon göster.
                 holder.binding.iconNotificationType.setImageResource(R.drawable.ic_default)
             }
         }
-        // --- YENİ EKLENEN KISIM BİTTİ ---
 
-        // Her bir satıra tıklama olayı (isteğe bağlı)
         holder.itemView.setOnClickListener {
             // Detay sayfasına yönlendirme mantığı buraya gelebilir.
         }

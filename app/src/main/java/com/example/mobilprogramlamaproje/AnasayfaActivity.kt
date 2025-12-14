@@ -2,7 +2,6 @@ package com.example.mobilprogramlamaproje
 
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
@@ -11,6 +10,7 @@ import com.example.mobilprogramlamaproje.databinding.ActivityAnasayfaBinding
 import com.google.android.material.chip.Chip
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
+import com.google.firebase.firestore.ListenerRegistration
 import com.google.firebase.firestore.Query
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
@@ -20,8 +20,9 @@ class AnasayfaActivity : AppCompatActivity() {
     private lateinit var auth: FirebaseAuth
     private lateinit var notificationsAdapter: NotificationsAdapter
     private var tumBildirimlerListesi = ArrayList<Notification>()
+    private var notificationTypeSettings: List<String>? = null
+    private var settingsListener: ListenerRegistration? = null
 
-    private val TAG = "AnasayfaActivity_DEBUG"
     private var isUpdatingChipsProgrammatically = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -31,15 +32,53 @@ class AnasayfaActivity : AppCompatActivity() {
         auth = Firebase.auth
         setupRecyclerView()
         setupListeners()
+        yukleBildirimler()
+    }
+
+    override fun onStart() {
+        super.onStart()
+        attachSettingsListener()
+    }
+
+    override fun onStop() {
+        super.onStop()
+        settingsListener?.remove()
     }
 
     override fun onResume() {
         super.onResume()
-        verileriYukle()
         binding.bottomNavigation.selectedItemId = R.id.nav_home
     }
 
-    private fun verileriYukle() {
+    private fun attachSettingsListener() {
+        settingsListener?.remove() // Önceki listener'ı kaldır
+        val user = auth.currentUser
+        if (user != null) {
+            val settingsRef = Firebase.firestore.collection("user_settings").document(user.uid)
+            settingsListener = settingsRef.addSnapshotListener { snapshot, e ->
+                if (e != null) {
+                    notificationTypeSettings = null
+                    listeyiGuncelle()
+                    return@addSnapshotListener
+                }
+
+                if (snapshot != null && snapshot.exists()) {
+                    val settings = snapshot.get("notification_types") as? List<String>
+                    // Ayarlar boşsa veya hiç yoksa null yap (hepsini göster)
+                    notificationTypeSettings = if (settings.isNullOrEmpty()) null else settings
+                } else {
+                    // Ayar dökümanı yoksa null yap (hepsini göster)
+                    notificationTypeSettings = null
+                }
+                listeyiGuncelle()
+            }
+        } else {
+            notificationTypeSettings = null
+            listeyiGuncelle()
+        }
+    }
+
+    private fun yukleBildirimler() {
         Firebase.firestore.collection("notifications").orderBy("timestamp", Query.Direction.DESCENDING)
             .get()
             .addOnSuccessListener { documents ->
@@ -62,6 +101,11 @@ class AnasayfaActivity : AppCompatActivity() {
         val currentUserId = auth.currentUser?.uid
 
         var filtrelenmisListe = tumBildirimlerListesi.toList()
+
+        // Kullanıcının bildirim ayarlarına göre filtrele
+        notificationTypeSettings?.let { settings ->
+             filtrelenmisListe = filtrelenmisListe.filter { notification -> settings.contains(notification.type) }
+        }
 
         if (!binding.chipTumU.isChecked) {
             if (isAcikSecili) {
@@ -164,16 +208,8 @@ class AnasayfaActivity : AppCompatActivity() {
                     startActivity(Intent(this, BildirimEkleActivity::class.java))
                     true 
                 }
-                R.id.nav_profile -> {
-                    auth.signOut()
-                    startActivity(Intent(this, MainActivity::class.java).apply {
-                        flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-                    })
-                    finish()
-                    true
-                }
-                R.id.nav_admin_paneli -> {
-                    // TODO: Admin paneli aktivitesini başlat
+                R.id.nav_profile_settings -> {
+                    startActivity(Intent(this, ProfileSettingsActivity::class.java))
                     true
                 }
                 else -> false

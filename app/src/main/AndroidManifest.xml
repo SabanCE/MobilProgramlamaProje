@@ -21,6 +21,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.MobilProgramlamaProje">
         <activity
+            android:name=".ProfileSettingsActivity"
+            android:exported="false" />
+        <activity
             android:name=".NotificationDetailActivity"
             android:exported="false" />
         <activity
@@ -50,7 +53,7 @@
             android:name=".RegisterActivity"
             android:exported="false" />
         <activity
-            android:name="SifremiUnuttumActivity"
+            android:name=".SifremiUnuttumActivity"
             android:exported="false" />
     </application>
 

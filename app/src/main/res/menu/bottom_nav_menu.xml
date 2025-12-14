@@ -1,35 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:android="http://schemas.android.com/apk/res/android"
-
-    >
-
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
 
     <item
         android:id="@+id/nav_home"
         android:icon="@android:drawable/ic_menu_myplaces"
-    android:title="Anasayfa" />
+        android:title="Anasayfa" />
 
     <item
         android:id="@+id/nav_map"
         android:icon="@android:drawable/ic_menu_mapmode"
-    android:title="Harita" />
+        android:title="Harita" />
 
     <item
         android:id="@+id/nav_create"
         android:icon="@android:drawable/ic_menu_add"
-    android:title="Oluştur" />
+        android:title="Oluştur" />
 
     <item
-        android:id="@+id/nav_profile"
+        android:id="@+id/nav_profile_settings"
         android:icon="@android:drawable/ic_menu_manage"
-    android:title="Profil" />
-    <item
-        android:id="@+id/nav_admin_paneli"
-        android:icon="@android:drawable/ic_menu_directions"
-    android:title="Admin Paneli"
-        
-        />
+        android:title="Profil Ve Ayarlar" />
 
 </menu>
-
-
