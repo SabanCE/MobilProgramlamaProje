@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -7,118 +7,152 @@
     android:background="@drawable/gradient_background"
     tools:context=".NotificationDetailActivity">
 
-    <LinearLayout
+    <RelativeLayout
+        android:id="@+id/headerLayout"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:padding="16dp">
+        android:layout_height="?attr/actionBarSize">
 
-        <!-- Ana Başlık -->
+        <ImageButton
+            android:id="@+id/backButton"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_alignParentStart="true"
+            android:layout_centerVertical="true"
+            android:layout_marginStart="16dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="Back"
+            android:src="?attr/homeAsUpIndicator"
+            app:tint="@android:color/black" />
+
         <TextView
-            android:id="@+id/tvDetailTitle"
-            android:layout_width="match_parent"
+            style="@style/TextAppearance.AppCompat.Title"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"
-            tools:text="Bildiri Başlığı"
+            android:layout_centerInParent="true"
+            android:text="Bildirim Detayı"
             android:textColor="@android:color/black"
-            android:textSize="26sp"
             android:textStyle="bold" />
 
-        <!-- Tür ve Durum -->
+    </RelativeLayout>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/headerLayout">
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:gravity="center_vertical"
-            android:orientation="horizontal">
+            android:orientation="vertical"
+            android:padding="16dp">
 
+            <!-- Ana Başlık -->
             <TextView
-                android:id="@+id/tvDetailType"
+                android:id="@+id/tvDetailTitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                android:textColor="@android:color/black"
+                android:textSize="26sp"
+                android:textStyle="bold"
+                tools:text="Bildiri Başlığı" />
+
+            <!-- Tür ve Durum -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/tvDetailType"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/edit_text_background"
+                    android:paddingStart="12dp"
+                    android:paddingTop="6dp"
+                    android:paddingEnd="12dp"
+                    android:paddingBottom="6dp"
+                    android:textSize="14sp"
+                    tools:text="Tür: Kayıp-Buluntu" />
+
+                <TextView
+                    android:id="@+id/tvDetailStatus"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:background="@drawable/edit_text_background"
+                    android:paddingStart="12dp"
+                    android:paddingTop="6dp"
+                    android:paddingEnd="12dp"
+                    android:paddingBottom="6dp"
+                    android:textSize="14sp"
+                    tools:text="Açık" />
+            </LinearLayout>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="16dp"
+                android:background="#e0e0e0" />
+
+            <!-- Tarih -->
+            <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:background="@drawable/edit_text_background"
-                android:paddingStart="12dp"
-                android:paddingTop="6dp"
-                android:paddingEnd="12dp"
-                android:paddingBottom="6dp"
-                tools:text="Tür: Kayıp-Buluntu"
+                android:text="Oluşturulma Tarihi"
+                android:textColor="#666666"
                 android:textSize="14sp" />
 
             <TextView
-                android:id="@+id/tvDetailStatus"
+                android:id="@+id/tvDetailTimestamp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
-                android:background="@drawable/edit_text_background"
-                android:paddingStart="12dp"
-                android:paddingTop="6dp"
-                android:paddingEnd="12dp"
-                android:paddingBottom="6dp"
-                tools:text="Açık"
-                android:textSize="14sp"/>
+                android:layout_marginBottom="16dp"
+                android:textColor="@android:color/black"
+                android:textSize="16sp"
+                tools:text="24 Mayıs 2024, 15:30" />
+
+            <!-- Açıklama -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Açıklama"
+                android:textColor="#666666"
+                android:textSize="14sp" />
+
+            <TextView
+                android:id="@+id/tvDetailDescription"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="20dp"
+                android:textColor="@android:color/black"
+                android:textSize="16sp"
+                tools:text="Burada olayın detaylı açıklaması yer alacaktır. Kullanıcı tarafından girilen tüm bilgiler bu alanda gösterilir." />
+
+            <!-- Fotoğraf ve Harita -->
+            <ImageView
+                android:id="@+id/ivDetailImage"
+                android:layout_width="match_parent"
+                android:layout_height="250dp"
+                android:layout_marginBottom="16dp"
+                android:scaleType="centerCrop"
+                android:visibility="gone" />
+
+            <com.google.android.gms.maps.MapView
+                android:id="@+id/mapViewDetail"
+                android:layout_width="match_parent"
+                android:layout_height="250dp"
+                android:apiKey="AIzaSyCp00RmEneG0rctZd-2ny9NZjvMCpMUWkk" />
+
+            <Button
+                android:id="@+id/btnToggleFollow"
+                android:layout_width="match_parent"
+                android:layout_height="60dp"
+                android:layout_marginTop="24dp"
+                android:text="Takip Et" />
+
         </LinearLayout>
-
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:layout_marginTop="16dp"
-            android:layout_marginBottom="16dp"
-            android:background="#e0e0e0" />
-
-        <!-- Tarih -->
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Oluşturulma Tarihi"
-            android:textSize="14sp"
-            android:textColor="#666666"/>
-
-        <TextView
-            android:id="@+id/tvDetailTimestamp"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"
-            tools:text="24 Mayıs 2024, 15:30"
-            android:textColor="@android:color/black"
-            android:textSize="16sp"/>
-
-        <!-- Açıklama -->
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Açıklama"
-            android:textSize="14sp"
-            android:textColor="#666666"/>
-
-        <TextView
-            android:id="@+id/tvDetailDescription"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="20dp"
-            android:textColor="@android:color/black"
-            android:textSize="16sp"
-            tools:text="Burada olayın detaylı açıklaması yer alacaktır. Kullanıcı tarafından girilen tüm bilgiler bu alanda gösterilir." />
-
-        <!-- Fotoğraf ve Harita -->
-        <ImageView
-            android:id="@+id/ivDetailImage"
-            android:layout_width="match_parent"
-            android:layout_height="250dp"
-            android:scaleType="centerCrop"
-            android:layout_marginBottom="16dp"
-            android:visibility="gone" />
-
-        <com.google.android.gms.maps.MapView
-            android:id="@+id/mapViewDetail"
-            android:layout_width="match_parent"
-            android:layout_height="250dp"
-            android:apiKey="AIzaSyCp00RmEneG0rctZd-2ny9NZjvMCpMUWkk"/>
-
-        <Button
-            android:id="@+id/btnToggleFollow"
-            android:layout_width="match_parent"
-            android:layout_height="60dp"
-            android:layout_marginTop="24dp"
-            android:text="Takip Et" />
-
-    </LinearLayout>
-</ScrollView>
+    </ScrollView>
+</RelativeLayout>

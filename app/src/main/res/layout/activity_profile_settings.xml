@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -7,132 +7,166 @@
     android:background="@drawable/gradient_background"
     tools:context=".ProfileSettingsActivity">
 
-    <LinearLayout
+    <RelativeLayout
+        android:id="@+id/headerLayout"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:padding="16dp">
+        android:layout_height="?attr/actionBarSize">
+
+        <ImageButton
+            android:id="@+id/backButton"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_alignParentStart="true"
+            android:layout_centerVertical="true"
+            android:layout_marginStart="16dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="Back"
+            android:src="?attr/homeAsUpIndicator"
+            app:tint="@android:color/black" />
 
         <TextView
-            android:id="@+id/headerProfilBilgileri"
-            android:layout_width="match_parent"
+            style="@style/TextAppearance.AppCompat.Title"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Profil Bilgileri"
-            android:textSize="20sp"
-            android:textStyle="bold"
-            android:drawableEnd="@android:drawable/arrow_down_float" />
+            android:layout_centerInParent="true"
+            android:text="Ayarlar"
+            android:textColor="@android:color/black"
+            android:textStyle="bold" />
+
+    </RelativeLayout>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/headerLayout">
 
         <LinearLayout
-            android:id="@+id/contentProfilBilgileri"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:visibility="gone">
+            android:padding="16dp">
 
             <TextView
-                android:id="@+id/textViewAdSoyad"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:text="Ad Soyad: " />
-
-            <TextView
-                android:id="@+id/textViewEmail"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:text="E-posta: " />
-
-            <TextView
-                android:id="@+id/textViewKullaniciRolu"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:text="Kullanıcı Rolü: " />
-
-            <TextView
-                android:id="@+id/textViewBirim"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:text="Birim: " />
-        </LinearLayout>
-
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:layout_marginTop="16dp"
-            android:background="@android:color/darker_gray" />
-
-        <TextView
-            android:id="@+id/headerBildirimAyarlari"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:text="Bildirim Ayarları"
-            android:textSize="20sp"
-            android:textStyle="bold"
-            android:drawableEnd="@android:drawable/arrow_down_float" />
-        
-        <LinearLayout
-            android:id="@+id/contentBildirimAyarlari"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:visibility="gone">
-
-            <CheckBox android:id="@+id/cbHepsi" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Hepsi"/>
-            <CheckBox android:id="@+id/cbSaglik" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Sağlık"/>
-            <CheckBox android:id="@+id/cbGuvenlik" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Güvenlik"/>
-            <CheckBox android:id="@+id/cbCevre" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Çevre"/>
-            <CheckBox android:id="@+id/cbKayipBuluntu" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Kayıp-Buluntu"/>
-            <CheckBox android:id="@+id/cbTeknikAriza" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Teknik Arıza"/>
-
-        </LinearLayout>
-
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:layout_marginTop="16dp"
-            android:background="@android:color/darker_gray" />
-
-        <TextView
-            android:id="@+id/headerTakipEdilenBildirimler"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:text="Takip Edilen Bildirimler"
-            android:textSize="20sp"
-            android:textStyle="bold"
-            android:drawableEnd="@android:drawable/arrow_down_float" />
-
-        <LinearLayout
-            android:id="@+id/contentTakipEdilenBildirimler"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:visibility="gone">
-
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/followedNotificationsRecyclerView"
+                android:id="@+id/headerProfilBilgileri"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp" />
+                android:text="Profil Bilgileri"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:drawableEnd="@android:drawable/arrow_down_float" />
+
+            <LinearLayout
+                android:id="@+id/contentProfilBilgileri"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+                <TextView
+                    android:id="@+id/textViewAdSoyad"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="Ad Soyad: " />
+
+                <TextView
+                    android:id="@+id/textViewEmail"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="E-posta: " />
+
+                <TextView
+                    android:id="@+id/textViewKullaniciRolu"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="Kullanıcı Rolü: " />
+
+                <TextView
+                    android:id="@+id/textViewBirim"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="Birim: " />
+            </LinearLayout>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginTop="16dp"
+                android:background="@android:color/darker_gray" />
+
+            <TextView
+                android:id="@+id/headerBildirimAyarlari"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:text="Bildirim Ayarları"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:drawableEnd="@android:drawable/arrow_down_float" />
+            
+            <LinearLayout
+                android:id="@+id/contentBildirimAyarlari"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+                <CheckBox android:id="@+id/cbHepsi" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Hepsi"/>
+                <CheckBox android:id="@+id/cbSaglik" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Sağlık"/>
+                <CheckBox android:id="@+id/cbGuvenlik" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Güvenlik"/>
+                <CheckBox android:id="@+id/cbCevre" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Çevre"/>
+                <CheckBox android:id="@+id/cbKayipBuluntu" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Kayıp-Buluntu"/>
+                <CheckBox android:id="@+id/cbTeknikAriza" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Teknik Arıza"/>
+
+            </LinearLayout>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginTop="16dp"
+                android:background="@android:color/darker_gray" />
+
+            <TextView
+                android:id="@+id/headerTakipEdilenBildirimler"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:text="Takip Edilen Bildirimler"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:drawableEnd="@android:drawable/arrow_down_float" />
+
+            <LinearLayout
+                android:id="@+id/contentTakipEdilenBildirimler"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/followedNotificationsRecyclerView"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp" />
+
+            </LinearLayout>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginTop="16dp"
+                android:background="@android:color/darker_gray" />
+
+            <Button
+                android:id="@+id/buttonCikisYap"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
+                android:text="Çıkış Yap" />
 
         </LinearLayout>
-
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:layout_marginTop="16dp"
-            android:background="@android:color/darker_gray" />
-
-        <Button
-            android:id="@+id/buttonCikisYap"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="24dp"
-            android:text="Çıkış Yap" />
-
-    </LinearLayout>
-</ScrollView>
+    </ScrollView>
+</RelativeLayout>

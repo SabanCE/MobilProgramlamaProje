@@ -22,6 +22,7 @@ class AnasayfaActivity : AppCompatActivity() {
     private var tumBildirimlerListesi = ArrayList<Notification>()
     private var notificationTypeSettings: List<String>? = null
     private var settingsListener: ListenerRegistration? = null
+    private var notificationsListener: ListenerRegistration? = null
 
     private var isUpdatingChipsProgrammatically = false
 
@@ -32,17 +33,18 @@ class AnasayfaActivity : AppCompatActivity() {
         auth = Firebase.auth
         setupRecyclerView()
         setupListeners()
-        yukleBildirimler()
     }
 
     override fun onStart() {
         super.onStart()
         attachSettingsListener()
+        attachNotificationsListener()
     }
 
     override fun onStop() {
         super.onStop()
         settingsListener?.remove()
+        notificationsListener?.remove()
     }
 
     override fun onResume() {
@@ -78,18 +80,24 @@ class AnasayfaActivity : AppCompatActivity() {
         }
     }
 
-    private fun yukleBildirimler() {
-        Firebase.firestore.collection("notifications").orderBy("timestamp", Query.Direction.DESCENDING)
-            .get()
-            .addOnSuccessListener { documents ->
-                tumBildirimlerListesi.clear()
-                for (document in documents) {
-                    document.toObject(Notification::class.java)?.let { 
-                        it.id = document.id
-                        tumBildirimlerListesi.add(it) 
-                    }
+    private fun attachNotificationsListener() {
+        notificationsListener?.remove()
+        notificationsListener = Firebase.firestore.collection("notifications").orderBy("timestamp", Query.Direction.DESCENDING)
+            .addSnapshotListener { snapshot, e ->
+                if (e != null) {
+                    return@addSnapshotListener
                 }
-                listeyiGuncelle()
+
+                if (snapshot != null) {
+                    tumBildirimlerListesi.clear()
+                    for (document in snapshot.documents) {
+                        document.toObject(Notification::class.java)?.let {
+                            it.id = document.id
+                            tumBildirimlerListesi.add(it)
+                        }
+                    }
+                    listeyiGuncelle()
+                }
             }
     }
 

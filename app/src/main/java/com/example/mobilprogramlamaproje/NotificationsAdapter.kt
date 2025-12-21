@@ -1,4 +1,6 @@
 package com.example.mobilprogramlamaproje
+
+import android.content.Intent
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
@@ -39,7 +41,7 @@ class NotificationsAdapter(private var notificationList: ArrayList<Notification>
                 holder.binding.iconNotificationType.setImageResource(R.drawable.ic_environment)
             }
             "Kayıp-Buluntu" -> {
-                holder.binding.iconNotificationType.setImageResource(R.drawable.ic_kayip_buluntu) 
+                holder.binding.iconNotificationType.setImageResource(R.drawable.ic_kayip_buluntu)
             }
             "Teknik Arıza" -> {
                 holder.binding.iconNotificationType.setImageResource(R.drawable.ic_teknik_ariza)
@@ -50,7 +52,11 @@ class NotificationsAdapter(private var notificationList: ArrayList<Notification>
         }
 
         holder.itemView.setOnClickListener {
-            // Detay sayfasına yönlendirme mantığı buraya gelebilir.
+            val context = holder.itemView.context
+            val intent = Intent(context, NotificationDetailActivity::class.java).apply {
+                putExtra("NOTIFICATION_ID", currentNotification.id)
+            }
+            context.startActivity(intent)
         }
     }
 

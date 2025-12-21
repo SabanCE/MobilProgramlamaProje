@@ -29,6 +29,8 @@ class NotificationDetailActivity : AppCompatActivity(), OnMapReadyCallback {
         binding = ActivityNotificationDetailBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        binding.backButton.setOnClickListener { finish() }
+
         notificationId = intent.getStringExtra("NOTIFICATION_ID")
 
         if (notificationId == null) {

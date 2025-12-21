@@ -66,6 +66,7 @@ class BildirimEkleActivity : AppCompatActivity() {
 
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
 
+        binding.backButton.setOnClickListener { finish() }
         binding.btnCihazKonumu.setOnClickListener { cihazKonumunuAl() }
         binding.btnHaritaKonumu.setOnClickListener { haritadanKonumSec() }
         binding.btnFotografEkle.setOnClickListener { fotografSec() }

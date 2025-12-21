@@ -28,6 +28,8 @@ class ProfileSettingsActivity : AppCompatActivity() {
         loadUserProfile()
         setupRecyclerView()
 
+        binding.backButton.setOnClickListener { finish() }
+
         binding.buttonCikisYap.setOnClickListener {
             auth.signOut()
             startActivity(Intent(this, MainActivity::class.java).apply {
