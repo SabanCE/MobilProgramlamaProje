@@ -2,6 +2,8 @@ package com.example.mobilprogramlamaproje
 
 import android.content.Intent
 import android.os.Bundle
+import android.view.View
+import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
@@ -66,10 +68,8 @@ class AnasayfaActivity : AppCompatActivity() {
 
                 if (snapshot != null && snapshot.exists()) {
                     val settings = snapshot.get("notification_types") as? List<String>
-                    // Ayarlar boşsa veya hiç yoksa null yap (hepsini göster)
                     notificationTypeSettings = if (settings.isNullOrEmpty()) null else settings
                 } else {
-                    // Ayar dökümanı yoksa null yap (hepsini göster)
                     notificationTypeSettings = null
                 }
                 listeyiGuncelle()
@@ -82,7 +82,8 @@ class AnasayfaActivity : AppCompatActivity() {
 
     private fun attachNotificationsListener() {
         notificationsListener?.remove()
-        notificationsListener = Firebase.firestore.collection("notifications").orderBy("timestamp", Query.Direction.DESCENDING)
+        notificationsListener = Firebase.firestore.collection("notifications")
+            .orderBy("timestamp", Query.Direction.DESCENDING)
             .addSnapshotListener { snapshot, e ->
                 if (e != null) {
                     return@addSnapshotListener
@@ -108,12 +109,16 @@ class AnasayfaActivity : AppCompatActivity() {
         val turFiltresi = binding.chipTurFilter.text.toString()
         val currentUserId = auth.currentUser?.uid
 
-        var filtrelenmisListe = tumBildirimlerListesi.toList()
+        // Separate emergency notifications
+        val emergencyNotifications = tumBildirimlerListesi.filter { "Acil Durum".equals(it.type, ignoreCase = true) }
+        var normalNotifications = tumBildirimlerListesi.filter { !"Acil Durum".equals(it.type, ignoreCase = true) }
 
-        // Kullanıcının bildirim ayarlarına göre filtrele
-        notificationTypeSettings?.let { settings ->
-             filtrelenmisListe = filtrelenmisListe.filter { notification -> settings.contains(notification.type) }
+        // Apply user settings only to normal notifications
+        notificationTypeSettings?.let {
+            normalNotifications = normalNotifications.filter { notification -> it.contains(notification.type) }
         }
+
+        var filtrelenmisListe: List<Notification> = normalNotifications
 
         if (!binding.chipTumU.isChecked) {
             if (isAcikSecili) {
@@ -144,8 +149,13 @@ class AnasayfaActivity : AppCompatActivity() {
                 }
             }
         }
+        
+        // Combine emergency notifications at the top
+        val sonListe = ArrayList<Notification>()
+        sonListe.addAll(emergencyNotifications)
+        sonListe.addAll(filtrelenmisListe)
 
-        notificationsAdapter.updateList(ArrayList(filtrelenmisListe))
+        notificationsAdapter.updateList(sonListe)
     }
 
     private fun setupRecyclerView() {

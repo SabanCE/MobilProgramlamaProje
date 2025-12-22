@@ -1,8 +1,10 @@
 package com.example.mobilprogramlamaproje
 
 import android.content.Intent
+import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.example.mobilprogramlamaproje.databinding.ItemNotificationBinding
 import java.text.SimpleDateFormat
@@ -30,7 +32,18 @@ class NotificationsAdapter(private var notificationList: ArrayList<Notification>
             holder.binding.textNotificationTime.text = sdf.format(timestamp.toDate())
         }
 
+        // Set background color based on notification type
+        if ("Acil Durum".equals(currentNotification.type, ignoreCase = true)) {
+            holder.binding.root.setCardBackgroundColor(ContextCompat.getColor(holder.itemView.context, R.color.emergency_background))
+        } else {
+            // Reset to default background
+            holder.binding.root.setCardBackgroundColor(Color.WHITE) // veya varsayılan renginiz
+        }
+
         when (currentNotification.type) {
+            "Acil Durum" -> {
+                holder.binding.iconNotificationType.setImageResource(R.drawable.emergency)
+            }
             "Sağlık" -> {
                 holder.binding.iconNotificationType.setImageResource(R.drawable.ic_health)
             }

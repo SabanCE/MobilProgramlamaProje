@@ -2,6 +2,9 @@ package com.example.mobilprogramlamaproje
 
 import android.os.Bundle
 import android.view.View
+import android.widget.ArrayAdapter
+import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import com.bumptech.glide.Glide
 import com.example.mobilprogramlamaproje.databinding.ActivityNotificationDetailBinding
@@ -14,6 +17,7 @@ import com.google.android.gms.maps.model.MarkerOptions
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.storage.FirebaseStorage
 import java.text.SimpleDateFormat
 import java.util.Locale
 
@@ -42,8 +46,97 @@ class NotificationDetailActivity : AppCompatActivity(), OnMapReadyCallback {
         binding.mapViewDetail.getMapAsync(this)
 
         loadNotificationDetails()
+        checkUserRole()
 
         binding.btnToggleFollow.setOnClickListener { toggleFollow() }
+    }
+
+    private fun checkUserRole() {
+        val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return
+        FirebaseFirestore.getInstance().collection("users").document(userId).get()
+            .addOnSuccessListener { document ->
+                if (document != null && "admin".equals(document.getString("role"), ignoreCase = true)) {
+                    setupAdminUI()
+                }
+            }
+    }
+
+    private fun setupAdminUI() {
+        binding.adminStatusLayout.visibility = View.VISIBLE
+        binding.btnDeleteNotification.visibility = View.VISIBLE
+        binding.publisherInfoLayout.visibility = View.VISIBLE
+
+        val statusOptions = arrayOf("Açık", "Kapalı", "Çözüldü", "İnceleniyor")
+        val adapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, statusOptions)
+        binding.spinnerStatus.adapter = adapter
+
+        notification?.status?.let {
+            val currentStatusPosition = statusOptions.indexOf(it)
+            if (currentStatusPosition != -1) {
+                binding.spinnerStatus.setSelection(currentStatusPosition)
+            }
+        }
+
+        binding.btnUpdateStatus.setOnClickListener { updateStatus() }
+        binding.btnDeleteNotification.setOnClickListener { confirmDelete() }
+
+        loadPublisherInfo()
+    }
+
+    private fun loadPublisherInfo() {
+        notification?.userId?.let { publisherId ->
+            FirebaseFirestore.getInstance().collection("users").document(publisherId).get()
+                .addOnSuccessListener { userDoc ->
+                    if (userDoc != null && userDoc.exists()) {
+                        val name = userDoc.getString("nameSurname") ?: "Bilinmiyor"
+                        val email = userDoc.getString("email") ?: ""
+                        binding.tvDetailPublisher.text = "$name ($email)"
+                    }
+                }
+        }
+    }
+
+    private fun confirmDelete() {
+        AlertDialog.Builder(this)
+            .setTitle("Bildirimi Sil")
+            .setMessage("Bu bildirimi kalıcı olarak silmek istediğinizden emin misiniz? Bu işlem geri alınamaz.")
+            .setPositiveButton("Sil") { _, _ -> deleteNotification() }
+            .setNegativeButton("İptal", null)
+            .show()
+    }
+
+    private fun deleteNotification() {
+        // Delete image from storage first
+        notification?.imageUrl?.let {
+            if (it.isNotEmpty()) {
+                FirebaseStorage.getInstance().getReferenceFromUrl(it).delete()
+            }
+        }
+
+        // Delete notification from firestore
+        FirebaseFirestore.getInstance().collection("notifications").document(notificationId!!)
+            .delete()
+            .addOnSuccessListener {
+                Toast.makeText(this, "Bildirim başarıyla silindi", Toast.LENGTH_LONG).show()
+                finish()
+            }
+            .addOnFailureListener { e ->
+                Toast.makeText(this, "Hata: ${e.message}", Toast.LENGTH_LONG).show()
+            }
+    }
+
+
+    private fun updateStatus() {
+        val newStatus = binding.spinnerStatus.selectedItem.toString()
+        FirebaseFirestore.getInstance().collection("notifications").document(notificationId!!)
+            .update("status", newStatus)
+            .addOnSuccessListener {
+                Toast.makeText(this, "Durum başarıyla güncellendi", Toast.LENGTH_SHORT).show()
+                binding.tvDetailStatus.text = "Durum: $newStatus"
+            }
+            .addOnFailureListener { e ->
+                Toast.makeText(this, "Hata: ${e.message}", Toast.LENGTH_SHORT).show()
+            }
     }
 
     private fun loadNotificationDetails() {
@@ -55,10 +148,11 @@ class NotificationDetailActivity : AppCompatActivity(), OnMapReadyCallback {
                     notification?.let {
                         it.id = document.id
                         updateUI(it)
-                        // Harita hazırsa, pini yükle
                         if (::mMap.isInitialized) {
                             loadPinOnMap(it)
                         }
+                        // Check role again after notification is loaded to ensure spinner is set correctly
+                        checkUserRole()
                     }
                 }
             }
@@ -119,7 +213,6 @@ class NotificationDetailActivity : AppCompatActivity(), OnMapReadyCallback {
 
     override fun onMapReady(googleMap: GoogleMap) {
         mMap = googleMap
-        // Harita hazır olduğunda, eğer bildirim bilgisi daha önce yüklendiyse pini haritaya ekle
         notification?.let { loadPinOnMap(it) }
     }
 

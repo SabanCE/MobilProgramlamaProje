@@ -11,6 +11,7 @@ import android.os.Bundle
 import android.provider.MediaStore
 import android.util.Log
 import android.view.View
+import android.widget.ArrayAdapter
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
@@ -23,6 +24,7 @@ import com.google.android.gms.location.Priority
 import com.google.android.gms.tasks.CancellationTokenSource
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.FirebaseStorage
 import java.util.Date
 import java.util.UUID
@@ -66,12 +68,35 @@ class BildirimEkleActivity : AppCompatActivity() {
 
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
 
+        setupSpinnerForUserRole()
+
         binding.backButton.setOnClickListener { finish() }
         binding.btnCihazKonumu.setOnClickListener { cihazKonumunuAl() }
         binding.btnHaritaKonumu.setOnClickListener { haritadanKonumSec() }
         binding.btnFotografEkle.setOnClickListener { fotografSec() }
         binding.btnGonder.setOnClickListener { bildirimiGonder() }
         binding.btnKaldirFoto.setOnClickListener { fotografiKaldir() }
+    }
+
+    private fun setupSpinnerForUserRole() {
+        val user = FirebaseAuth.getInstance().currentUser
+        if (user == null) {
+            // Handle not logged in user
+            finish()
+            return
+        }
+
+        FirebaseFirestore.getInstance().collection("users").document(user.uid).get()
+            .addOnSuccessListener { document ->
+                val isAdmin = document != null && "admin".equals(document.getString("role"), ignoreCase = true)
+                val statusOptions = if (isAdmin) {
+                    resources.getStringArray(R.array.yeni_tur_array).toList() + "Acil Durum"
+                } else {
+                    resources.getStringArray(R.array.yeni_tur_array).toList()
+                }
+                val adapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, statusOptions)
+                binding.spinnerTur.adapter = adapter
+            }
     }
 
     private fun fotografiKaldir() {
@@ -94,7 +119,6 @@ class BildirimEkleActivity : AppCompatActivity() {
             return
         }
 
-        // O anki konumu güvenilir bir şekilde al
         fusedLocationClient.getCurrentLocation(Priority.PRIORITY_HIGH_ACCURACY, CancellationTokenSource().token)
             .addOnSuccessListener { location: Location? ->
                 if (location != null) {
@@ -191,6 +215,8 @@ class BildirimEkleActivity : AppCompatActivity() {
     }
 
     private fun veritabaninaKaydet(userId: String, tur: String, baslik: String, aciklama: String, fotoUrl: String?) {
+        val bildirimStatus = if ("Acil Durum".equals(tur, ignoreCase = true)) "ACİL" else "Açık"
+
         val bildirim = hashMapOf(
             "type" to tur,
             "title" to baslik,
@@ -199,7 +225,7 @@ class BildirimEkleActivity : AppCompatActivity() {
             "longitude" to secilenKonum!!.longitude,
             "imageUrl" to fotoUrl,
             "timestamp" to Date(),
-            "status" to "Açık",
+            "status" to bildirimStatus,
             "userId" to userId
         )
 
