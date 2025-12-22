@@ -24,6 +24,8 @@ class RegisterActivity : AppCompatActivity() {
 
         auth = Firebase.auth // Firebase Authentication nesnesini başlat
 
+        binding.backButton.setOnClickListener { finish() }
+
         binding.registerButton.setOnClickListener {
             binding.registerButton.isEnabled = false // Butonu devre dışı bırak
 

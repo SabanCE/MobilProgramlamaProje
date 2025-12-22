@@ -20,6 +20,7 @@ class SifremiUnuttumActivity : AppCompatActivity() {
         setContentView(binding.root)
         auth = Firebase.auth
 
+        binding.backButton.setOnClickListener { finish() }
 
         binding.sendResetEmailButton.setOnClickListener {
             val email = binding.emailInput.text.toString().trim()

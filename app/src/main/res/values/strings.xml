@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">MobilProgramlamaProje</string>
+    <string name="app_name">Kampüs güvende</string>
     <string-array name="tur_array">
         <item>Tüm Türler</item>
         <item>Sağlık</item>
