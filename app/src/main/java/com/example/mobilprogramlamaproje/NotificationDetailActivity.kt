@@ -1,6 +1,8 @@
 package com.example.mobilprogramlamaproje
 
+import android.annotation.SuppressLint
 import android.os.Bundle
+import android.view.MotionEvent
 import android.view.View
 import android.widget.ArrayAdapter
 import android.widget.Toast
@@ -28,6 +30,7 @@ class NotificationDetailActivity : AppCompatActivity(), OnMapReadyCallback {
     private lateinit var mMap: GoogleMap
     private var notification: Notification? = null
 
+    @SuppressLint("ClickableViewAccessibility")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityNotificationDetailBinding.inflate(layoutInflater)
@@ -45,6 +48,25 @@ class NotificationDetailActivity : AppCompatActivity(), OnMapReadyCallback {
         binding.mapViewDetail.onCreate(savedInstanceState)
         binding.mapViewDetail.getMapAsync(this)
 
+        // Fix for MapView touch events in ScrollView
+        binding.mapOverlay.setOnTouchListener { _, event ->
+            when (event.action) {
+                MotionEvent.ACTION_DOWN -> {
+                    binding.detailScrollView.requestDisallowInterceptTouchEvent(true)
+                    false
+                }
+                MotionEvent.ACTION_UP -> {
+                    binding.detailScrollView.requestDisallowInterceptTouchEvent(false)
+                    true
+                }
+                MotionEvent.ACTION_MOVE -> {
+                    binding.detailScrollView.requestDisallowInterceptTouchEvent(true)
+                    false
+                }
+                else -> true
+            }
+        }
+
         loadNotificationDetails()
         checkUserRole()
 
@@ -57,6 +79,8 @@ class NotificationDetailActivity : AppCompatActivity(), OnMapReadyCallback {
             .addOnSuccessListener { document ->
                 if (document != null && "admin".equals(document.getString("role"), ignoreCase = true)) {
                     setupAdminUI()
+                } else {
+                    binding.btnToggleFollow.visibility = View.VISIBLE
                 }
             }
     }
@@ -65,8 +89,9 @@ class NotificationDetailActivity : AppCompatActivity(), OnMapReadyCallback {
         binding.adminStatusLayout.visibility = View.VISIBLE
         binding.btnDeleteNotification.visibility = View.VISIBLE
         binding.publisherInfoLayout.visibility = View.VISIBLE
+        binding.btnToggleFollow.visibility = View.GONE // Admin can't follow
 
-        val statusOptions = arrayOf("Açık", "Kapalı", "Çözüldü", "İnceleniyor")
+        val statusOptions = arrayOf("Açık", "Çözüldü", "İnceleniyor")
         val adapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, statusOptions)
         binding.spinnerStatus.adapter = adapter
 
@@ -90,7 +115,8 @@ class NotificationDetailActivity : AppCompatActivity(), OnMapReadyCallback {
                     if (userDoc != null && userDoc.exists()) {
                         val name = userDoc.getString("nameSurname") ?: "Bilinmiyor"
                         val email = userDoc.getString("email") ?: ""
-                        binding.tvDetailPublisher.text = "$name ($email)"
+                        binding.tvDetailPublisherName.text = "Oluşturan: $name"
+                        binding.tvDetailPublisherEmail.text = "E-posta: $email"
                     }
                 }
         }
@@ -233,8 +259,9 @@ class NotificationDetailActivity : AppCompatActivity(), OnMapReadyCallback {
 
     private fun getMarkerColor(type: String?): Float {
         return when (type) {
+            "Acil Durum" -> BitmapDescriptorFactory.HUE_RED
             "Sağlık" -> BitmapDescriptorFactory.HUE_BLUE
-            "Güvenlik" -> BitmapDescriptorFactory.HUE_RED
+            "Güvenlik" -> BitmapDescriptorFactory.HUE_CYAN
             "Çevre" -> BitmapDescriptorFactory.HUE_GREEN
             "Kayıp-Buluntu" -> BitmapDescriptorFactory.HUE_YELLOW
             "Teknik Arıza" -> BitmapDescriptorFactory.HUE_VIOLET

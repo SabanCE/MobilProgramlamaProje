@@ -8,6 +8,7 @@ import android.view.View
 import android.widget.ImageButton
 import android.widget.TextView
 import android.widget.Toast
+import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
@@ -18,6 +19,8 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.firebase.Timestamp
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.firestore.ListenerRegistration
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import java.util.concurrent.TimeUnit
@@ -30,6 +33,8 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
     private var selectedLocationMarker: Marker? = null
     private var savedSelectedLatLng: LatLng? = null
     private var notificationType: String? = null
+    private var notificationTypeSettings: List<String>? = null
+    private var settingsListener: ListenerRegistration? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -46,9 +51,46 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         mapFragment.getMapAsync(this)
 
         val backButton = findViewById<ImageButton>(R.id.backButton)
-        backButton.setOnClickListener {
-            finish()
+        backButton.setOnClickListener { goToHome() }
+
+        // Geri tuşu kontrolü
+        onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                goToHome()
+            }
+        })
+
+        attachSettingsListener()
+    }
+
+    private fun goToHome() {
+        val intent = Intent(this, AnasayfaActivity::class.java)
+        intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
+        startActivity(intent)
+        finish()
+    }
+
+    private fun attachSettingsListener() {
+        val user = Firebase.auth.currentUser
+        if (user != null) {
+            val settingsRef = Firebase.firestore.collection("user_settings").document(user.uid)
+            settingsListener = settingsRef.addSnapshotListener { snapshot, e ->
+                if (e != null) return@addSnapshotListener
+                if (snapshot != null && snapshot.exists()) {
+                    notificationTypeSettings = snapshot.get("notification_types") as? List<String>
+                } else {
+                    notificationTypeSettings = null
+                }
+                if (::mMap.isInitialized) {
+                    haritayaBildirimleriYukle()
+                }
+            }
         }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        settingsListener?.remove()
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -61,7 +103,6 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
     override fun onMapReady(googleMap: GoogleMap) {
         mMap = googleMap
         mMap.clear()
-        Log.d(TAG, "Harita hazırlandı.")
         val ataturkUniversitesi = LatLng(39.901253, 41.248184)
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(ataturkUniversitesi, 14f))
 
@@ -71,7 +112,6 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
         if (isSelectionMode) {
             Toast.makeText(this, "Haritadan bir konum seçin", Toast.LENGTH_LONG).show()
-
             val markerColor = getMarkerColor(notificationType ?: "") ?: BitmapDescriptorFactory.HUE_CYAN
 
             savedSelectedLatLng?.let { latLng ->
@@ -82,7 +122,6 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                         .snippet("Onaylamak için buraya dokunun")
                         .icon(BitmapDescriptorFactory.defaultMarker(markerColor))
                 )
-                selectedLocationMarker?.tag = null
             }
 
             mMap.setOnMapClickListener { latLng ->
@@ -94,7 +133,6 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                         .snippet("Onaylamak için buraya dokunun")
                         .icon(BitmapDescriptorFactory.defaultMarker(markerColor))
                 )
-                selectedLocationMarker?.tag = null
                 selectedLocationMarker?.showInfoWindow()
             }
 
@@ -108,7 +146,6 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                     finish()
                 }
             }
-
         } else {
             mMap.setOnInfoWindowClickListener { marker ->
                 val notificationId = marker.tag as? String
@@ -121,23 +158,28 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         }
     }
 
-
     private fun haritayaBildirimleriYukle() {
+        if (!::mMap.isInitialized) return
+        mMap.clear()
+        
         val db = Firebase.firestore
         db.collection("notifications").get()
             .addOnSuccessListener { documents ->
                 for (document in documents) {
                     document.toObject(Notification::class.java)?.let { notification ->
-                        if (notification.latitude != null && notification.longitude != null) {
+                        // Filtreleme kontrolü: Ayarlarda seçili değilse gösterme (Acil Durum her zaman gösterilir)
+                        val isTypeAllowed = notificationTypeSettings == null || 
+                                           notification.type == "Acil Durum" || 
+                                           notificationTypeSettings?.contains(notification.type) == true
+
+                        if (isTypeAllowed && notification.latitude != null && notification.longitude != null) {
                             getMarkerColor(notification.type ?: "")?.let { color ->
                                 val position = LatLng(notification.latitude, notification.longitude)
-                                val zamanFarki = zamanFarkiniHesapla(notification.timestamp)
-
                                 val marker = mMap.addMarker(
                                     MarkerOptions()
                                         .position(position)
                                         .title(notification.title)
-                                        .snippet(zamanFarki)
+                                        .snippet(zamanFarkiniHesapla(notification.timestamp))
                                         .icon(BitmapDescriptorFactory.defaultMarker(color))
                                 )
                                 marker?.tag = document.id
@@ -145,17 +187,18 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                         }
                     }
                 }
-            }.addOnFailureListener { Log.e(TAG, "Hata: Bildirimler çekilemedi!", it) }
+            }
     }
 
     private fun getMarkerColor(type: String): Float? {
         return when (type) {
+            "Acil Durum" -> BitmapDescriptorFactory.HUE_RED
             "Sağlık" -> BitmapDescriptorFactory.HUE_BLUE
-            "Güvenlik" -> BitmapDescriptorFactory.HUE_RED
+            "Güvenlik" -> BitmapDescriptorFactory.HUE_CYAN
             "Çevre" -> BitmapDescriptorFactory.HUE_GREEN
             "Kayıp-Buluntu" -> BitmapDescriptorFactory.HUE_YELLOW
             "Teknik Arıza" -> BitmapDescriptorFactory.HUE_VIOLET
-            else -> null // Diğer türler için renk atama, haritada gösterilmeyecek
+            else -> null
         }
     }
 
@@ -171,23 +214,11 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
     
     inner class CustomInfoWindowAdapter : GoogleMap.InfoWindowAdapter {
         private val window: View = layoutInflater.inflate(R.layout.custom_info_window, null)
-
-        override fun getInfoContents(marker: Marker): View? {
-            render(marker, window)
-            return window
-        }
-
-        override fun getInfoWindow(marker: Marker): View? {
-            render(marker, window)
-            return window
-        }
-
+        override fun getInfoContents(marker: Marker): View? { render(marker, window); return window }
+        override fun getInfoWindow(marker: Marker): View? { render(marker, window); return window }
         private fun render(marker: Marker, view: View) {
-            val titleTextView = view.findViewById<TextView>(R.id.tvTitle)
-            titleTextView.text = marker.title
-
-            val snippetTextView = view.findViewById<TextView>(R.id.tvSnippet)
-            snippetTextView.text = marker.snippet
+            view.findViewById<TextView>(R.id.tvTitle).text = marker.title
+            view.findViewById<TextView>(R.id.tvSnippet).text = marker.snippet
         }
     }
 }

@@ -3,7 +3,7 @@ package com.example.mobilprogramlamaproje
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
-import android.widget.CheckBox
+import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.mobilprogramlamaproje.databinding.ActivityProfileSettingsBinding
@@ -27,8 +27,10 @@ class ProfileSettingsActivity : AppCompatActivity() {
         setupClickListeners()
         loadUserProfile()
         setupRecyclerView()
+        setupBottomNavigation()
+        checkUserRole()
 
-        binding.backButton.setOnClickListener { finish() }
+        binding.backButton.setOnClickListener { goToHome() }
 
         binding.buttonCikisYap.setOnClickListener {
             auth.signOut()
@@ -37,27 +39,71 @@ class ProfileSettingsActivity : AppCompatActivity() {
             })
             finish()
         }
+
+        onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                goToHome()
+            }
+        })
+    }
+
+    private fun goToHome() {
+        val intent = Intent(this, AnasayfaActivity::class.java)
+        intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
+        startActivity(intent)
+        finish()
+    }
+
+    private fun setupBottomNavigation() {
+        binding.bottomNavigation.selectedItemId = R.id.nav_profile_settings
+        binding.bottomNavigation.setOnItemSelectedListener { item ->
+            when (item.itemId) {
+                R.id.nav_home -> { goToHome(); true }
+                R.id.nav_map -> { startActivity(Intent(this, MapsActivity::class.java)); true }
+                R.id.nav_create -> { startActivity(Intent(this, BildirimEkleActivity::class.java)); true }
+                R.id.nav_admin_panel -> { startActivity(Intent(this, AdminPanelActivity::class.java)); true }
+                R.id.nav_profile_settings -> true
+                else -> false
+            }
+        }
+    }
+
+    private fun checkUserRole() {
+        val user = auth.currentUser
+        if (user != null) {
+            Firebase.firestore.collection("users").document(user.uid).get()
+                .addOnSuccessListener { document ->
+                    if (document != null && document.exists()) {
+                        val role = document.getString("role")
+                        val menu = binding.bottomNavigation.menu
+                        if (role == "Admin") {
+                            menu.findItem(R.id.nav_admin_panel).isVisible = true
+                            menu.findItem(R.id.nav_create).isVisible = false
+                            
+                            binding.headerTakipEdilenBildirimler.visibility = View.GONE
+                            binding.contentTakipEdilenBildirimler.visibility = View.GONE
+                            binding.lineBildirim.visibility = View.GONE // Gereksiz çizgiyi kaldır
+                        } else {
+                            menu.findItem(R.id.nav_admin_panel).isVisible = false
+                            menu.findItem(R.id.nav_create).isVisible = true
+                            
+                            binding.headerTakipEdilenBildirimler.visibility = View.VISIBLE
+                            binding.lineBildirim.visibility = View.VISIBLE
+                        }
+                    }
+                }
+        }
     }
 
     private fun setupClickListeners() {
-        binding.headerProfilBilgileri.setOnClickListener {
-            toggleVisibility(binding.contentProfilBilgileri)
-        }
-
+        binding.headerProfilBilgileri.setOnClickListener { toggleVisibility(binding.contentProfilBilgileri) }
         binding.headerBildirimAyarlari.setOnClickListener {
-            val content = binding.contentBildirimAyarlari
-            toggleVisibility(content)
-            if (content.visibility == View.VISIBLE) {
-                loadNotificationSettings()
-            }
+            toggleVisibility(binding.contentBildirimAyarlari)
+            if (binding.contentBildirimAyarlari.visibility == View.VISIBLE) loadNotificationSettings()
         }
-
         binding.headerTakipEdilenBildirimler.setOnClickListener {
-            val content = binding.contentTakipEdilenBildirimler
-            toggleVisibility(content)
-            if (content.visibility == View.VISIBLE) {
-                loadFollowedNotifications()
-            }
+            toggleVisibility(binding.contentTakipEdilenBildirimler)
+            if (binding.contentTakipEdilenBildirimler.visibility == View.VISIBLE) loadFollowedNotifications()
         }
     }
 
@@ -74,19 +120,13 @@ class ProfileSettingsActivity : AppCompatActivity() {
     private fun loadUserProfile() {
         val user = auth.currentUser
         if (user != null) {
-            val db = Firebase.firestore
-            db.collection("users").document(user.uid).get()
+            Firebase.firestore.collection("users").document(user.uid).get()
                 .addOnSuccessListener { document ->
                     if (document != null && document.exists()) {
-                        val adSoyad = document.getString("nameSurname") ?: ""
-                        val email = user.email
-                        val rol = document.getString("role") ?: ""
-                        val birim = document.getString("unit") ?: ""
-
-                        binding.textViewAdSoyad.text = "Ad Soyad: $adSoyad"
-                        binding.textViewEmail.text = "E-posta: $email"
-                        binding.textViewKullaniciRolu.text = "Kullanıcı Rolü: $rol"
-                        binding.textViewBirim.text = "Birim: $birim"
+                        binding.textViewAdSoyad.text = "Ad Soyad: ${document.getString("nameSurname") ?: ""}"
+                        binding.textViewEmail.text = "E-posta: ${user.email}"
+                        binding.textViewKullaniciRolu.text = "Kullanıcı Rolü: ${document.getString("role") ?: ""}"
+                        binding.textViewBirim.text = "Birim: ${document.getString("unit") ?: ""}"
                     }
                 }
         }
@@ -95,8 +135,7 @@ class ProfileSettingsActivity : AppCompatActivity() {
     private fun loadFollowedNotifications() {
         val user = auth.currentUser
         if (user != null) {
-            val db = Firebase.firestore
-            db.collection("notifications")
+            Firebase.firestore.collection("notifications")
                 .whereArrayContains("followers", user.uid)
                 .get()
                 .addOnSuccessListener { documents ->
@@ -115,19 +154,21 @@ class ProfileSettingsActivity : AppCompatActivity() {
     private fun loadNotificationSettings() {
         val user = auth.currentUser
         if (user != null) {
-            val db = Firebase.firestore
-            db.collection("user_settings").document(user.uid).get()
+            Firebase.firestore.collection("user_settings").document(user.uid).get()
                 .addOnSuccessListener { document ->
                     isUpdatingCheckboxes = true
-                    if (document != null && document.exists() && (document.get("notification_types") as? List<*>)?.isNotEmpty() == true) {
-                        val settings = document.get("notification_types") as List<String>
-                        binding.cbSaglik.isChecked = settings.contains("Sağlık")
-                        binding.cbGuvenlik.isChecked = settings.contains("Güvenlik")
-                        binding.cbCevre.isChecked = settings.contains("Çevre")
-                        binding.cbKayipBuluntu.isChecked = settings.contains("Kayıp-Buluntu")
-                        binding.cbTeknikAriza.isChecked = settings.contains("Teknik Arıza")
+                    if (document != null && document.exists()) {
+                        val settings = document.get("notification_types") as? List<String>
+                        if (!settings.isNullOrEmpty()) {
+                            binding.cbSaglik.isChecked = settings.contains("Sağlık")
+                            binding.cbGuvenlik.isChecked = settings.contains("Güvenlik")
+                            binding.cbCevre.isChecked = settings.contains("Çevre")
+                            binding.cbKayipBuluntu.isChecked = settings.contains("Kayıp-Buluntu")
+                            binding.cbTeknikAriza.isChecked = settings.contains("Teknik Arıza")
+                        } else {
+                            setAllCheckBoxes(true)
+                        }
                     } else {
-                        // Varsayılan olarak hepsini seç
                         setAllCheckBoxes(true)
                     }
                     updateHepsiCheckboxState()
@@ -138,33 +179,18 @@ class ProfileSettingsActivity : AppCompatActivity() {
     }
 
     private fun setupCheckboxListeners() {
-        val otherCheckBoxes = listOf(binding.cbSaglik, binding.cbGuvenlik, binding.cbCevre, binding.cbKayipBuluntu, binding.cbTeknikAriza)
-
+        val boxes = listOf(binding.cbSaglik, binding.cbGuvenlik, binding.cbCevre, binding.cbKayipBuluntu, binding.cbTeknikAriza)
         binding.cbHepsi.setOnClickListener { 
             if (isUpdatingCheckboxes) return@setOnClickListener
-
-            val wasChecked = !binding.cbHepsi.isChecked
-            if (wasChecked) { 
-                binding.cbHepsi.isChecked = true
-                return@setOnClickListener
-            }
-            
+            val check = binding.cbHepsi.isChecked
             isUpdatingCheckboxes = true
-            otherCheckBoxes.forEach { it.isChecked = true }
+            boxes.forEach { it.isChecked = check }
             isUpdatingCheckboxes = false
             saveNotificationSettings()
         }
-
-        otherCheckBoxes.forEach { checkBox ->
-            checkBox.setOnClickListener { 
+        boxes.forEach { box ->
+            box.setOnClickListener { 
                 if (isUpdatingCheckboxes) return@setOnClickListener
-                
-                val totalChecked = otherCheckBoxes.count { it.isChecked }
-                if (totalChecked == 0) { 
-                    checkBox.isChecked = true
-                    return@setOnClickListener
-                }
-
                 updateHepsiCheckboxState()
                 saveNotificationSettings()
             }
@@ -173,8 +199,8 @@ class ProfileSettingsActivity : AppCompatActivity() {
     
     private fun updateHepsiCheckboxState() {
         isUpdatingCheckboxes = true
-        val otherCheckBoxes = listOf(binding.cbSaglik, binding.cbGuvenlik, binding.cbCevre, binding.cbKayipBuluntu, binding.cbTeknikAriza)
-        binding.cbHepsi.isChecked = otherCheckBoxes.all { it.isChecked }
+        val boxes = listOf(binding.cbSaglik, binding.cbGuvenlik, binding.cbCevre, binding.cbKayipBuluntu, binding.cbTeknikAriza)
+        binding.cbHepsi.isChecked = boxes.all { it.isChecked }
         isUpdatingCheckboxes = false
     }
 
@@ -189,15 +215,12 @@ class ProfileSettingsActivity : AppCompatActivity() {
 
     private fun saveNotificationSettings() {
         val user = auth.currentUser ?: return
-
-        val selectedTypes = ArrayList<String>()
-        if (binding.cbSaglik.isChecked) selectedTypes.add("Sağlık")
-        if (binding.cbGuvenlik.isChecked) selectedTypes.add("Güvenlik")
-        if (binding.cbCevre.isChecked) selectedTypes.add("Çevre")
-        if (binding.cbKayipBuluntu.isChecked) selectedTypes.add("Kayıp-Buluntu")
-        if (binding.cbTeknikAriza.isChecked) selectedTypes.add("Teknik Arıza")
-        
-        val settings = hashMapOf("notification_types" to selectedTypes)
-        Firebase.firestore.collection("user_settings").document(user.uid).set(settings)
+        val selected = ArrayList<String>()
+        if (binding.cbSaglik.isChecked) selected.add("Sağlık")
+        if (binding.cbGuvenlik.isChecked) selected.add("Güvenlik")
+        if (binding.cbCevre.isChecked) selected.add("Çevre")
+        if (binding.cbKayipBuluntu.isChecked) selected.add("Kayıp-Buluntu")
+        if (binding.cbTeknikAriza.isChecked) selected.add("Teknik Arıza")
+        Firebase.firestore.collection("user_settings").document(user.uid).set(hashMapOf("notification_types" to selected))
     }
 }

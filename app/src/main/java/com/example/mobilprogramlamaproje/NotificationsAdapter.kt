@@ -32,36 +32,26 @@ class NotificationsAdapter(private var notificationList: ArrayList<Notification>
             holder.binding.textNotificationTime.text = sdf.format(timestamp.toDate())
         }
 
-        // Set background color based on notification type
-        if ("Acil Durum".equals(currentNotification.type, ignoreCase = true)) {
+        // Renk Mantığı:
+        // Sadece "Acil Durum" olan VE durumu "Çözüldü" OLMAYAN bildirimler renkli (pembe/kırmızı) gözükür.
+        // Çözüldü olan acil durumlar normal bildirimler gibi beyaz olur.
+        val isEmergency = "Acil Durum".equals(currentNotification.type, ignoreCase = true)
+        val isResolved = "Çözüldü".equals(currentNotification.status, ignoreCase = true)
+
+        if (isEmergency && !isResolved) {
             holder.binding.root.setCardBackgroundColor(ContextCompat.getColor(holder.itemView.context, R.color.emergency_background))
         } else {
-            // Reset to default background
-            holder.binding.root.setCardBackgroundColor(Color.WHITE) // veya varsayılan renginiz
+            holder.binding.root.setCardBackgroundColor(Color.WHITE)
         }
 
         when (currentNotification.type) {
-            "Acil Durum" -> {
-                holder.binding.iconNotificationType.setImageResource(R.drawable.emergency)
-            }
-            "Sağlık" -> {
-                holder.binding.iconNotificationType.setImageResource(R.drawable.ic_health)
-            }
-            "Güvenlik" -> {
-                holder.binding.iconNotificationType.setImageResource(R.drawable.ic_security)
-            }
-            "Çevre" -> {
-                holder.binding.iconNotificationType.setImageResource(R.drawable.ic_environment)
-            }
-            "Kayıp-Buluntu" -> {
-                holder.binding.iconNotificationType.setImageResource(R.drawable.ic_kayip_buluntu)
-            }
-            "Teknik Arıza" -> {
-                holder.binding.iconNotificationType.setImageResource(R.drawable.ic_teknik_ariza)
-            }
-            else -> {
-                holder.binding.iconNotificationType.setImageResource(R.drawable.ic_default)
-            }
+            "Acil Durum" -> holder.binding.iconNotificationType.setImageResource(R.drawable.emergency)
+            "Sağlık" -> holder.binding.iconNotificationType.setImageResource(R.drawable.ic_health)
+            "Güvenlik" -> holder.binding.iconNotificationType.setImageResource(R.drawable.ic_security)
+            "Çevre" -> holder.binding.iconNotificationType.setImageResource(R.drawable.ic_environment)
+            "Kayıp-Buluntu" -> holder.binding.iconNotificationType.setImageResource(R.drawable.ic_kayip_buluntu)
+            "Teknik Arıza" -> holder.binding.iconNotificationType.setImageResource(R.drawable.ic_teknik_ariza)
+            else -> holder.binding.iconNotificationType.setImageResource(R.drawable.ic_default)
         }
 
         holder.itemView.setOnClickListener {
@@ -73,9 +63,7 @@ class NotificationsAdapter(private var notificationList: ArrayList<Notification>
         }
     }
 
-    override fun getItemCount(): Int {
-        return notificationList.size
-    }
+    override fun getItemCount(): Int = notificationList.size
 
     fun updateList(newList: ArrayList<Notification>) {
         notificationList.clear()
