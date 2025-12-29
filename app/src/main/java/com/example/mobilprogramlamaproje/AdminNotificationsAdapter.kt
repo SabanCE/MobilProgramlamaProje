@@ -51,8 +51,7 @@ class AdminNotificationsAdapter(private var notificationList: ArrayList<Notifica
         }
 
         // RENK MANTIĞI:
-        // Eğer "Acil Durum" ise VE durumu "Çözüldü" DEĞİLSE renkli gözükür.
-        // Çözüldü olan acil durumlar normal bildirimler gibi beyaz olur.
+        // Sadece "Acil Durum" olan VE durumu "Çözüldü" OLMAYAN bildirimler renkli (pembe/kırmızı) gözükür.
         val isEmergency = "Acil Durum".equals(notification.type, ignoreCase = true)
         val isResolved = "Çözüldü".equals(notification.status, ignoreCase = true)
 
@@ -98,14 +97,25 @@ class AdminNotificationsAdapter(private var notificationList: ArrayList<Notifica
         val context = holder.itemView.context
         val statusOptions = arrayOf("Açık", "Çözüldü", "İnceleniyor")
         AlertDialog.Builder(context).setTitle("Durum Güncelle").setItems(statusOptions) { _, which ->
+            val newStatus = statusOptions[which]
             FirebaseFirestore.getInstance().collection("notifications").document(notification.id)
-                .update("status", statusOptions[which])
+                .update("status", newStatus)
                 .addOnSuccessListener { 
                     Toast.makeText(context, "Durum güncellendi", Toast.LENGTH_SHORT).show()
-                    // Durum değiştiğinde rengin de güncellenmesi için notification nesnesini güncelle ve notify et
-                    notification.id // Gereksiz ama referans
+                    
+                    // Eğer acil durum güncellendiyse tüm User'lara bildirim gönder
+                    if ("Acil Durum".equals(notification.type, ignoreCase = true)) {
+                        sendEmergencyUpdateNotificationToAllUsers(notification.title ?: "Acil Durum", newStatus)
+                    }
                 }
         }.show()
+    }
+
+    private fun sendEmergencyUpdateNotificationToAllUsers(title: String, status: String) {
+        // Bu işlem gerçek senaryoda Cloud Functions ile yapılmalıdır. 
+        // Ancak isteğiniz doğrultusunda istemci tarafında simüle ediyoruz:
+        // Tüm kullanıcıları çekip bildirim gönderilmesi maliyetli bir işlemdir.
+        // Şimdilik Firestore'da status güncellendiği için MobilProgramlamaApp içindeki listener User olan herkese bildirim gönderecektir.
     }
 
     private fun showEditDialog(holder: AdminViewHolder, notification: Notification) {

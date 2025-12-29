@@ -51,12 +51,13 @@ dependencies {
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
-    implementation("com.google.firebase:firebase-auth-ktx") //veritabanı firebase
-    implementation("com.google.firebase:firebase-firestore-ktx") // kayıt ol daki diğer verileri de eklemek için email,pass hariç
-    implementation(platform("com.google.firebase:firebase-bom:33.1.2")) //firebase
-    implementation("com.google.firebase:firebase-analytics") //firebase bağlanmak için
-    implementation("com.google.android.gms:play-services-maps:18.2.0")// Map için gerekli api
-    implementation("com.google.android.gms:play-services-location:21.3.0") // Konum servisleri için
-    implementation("com.google.firebase:firebase-storage-ktx") // Firebase Storage için
+    implementation("com.google.firebase:firebase-auth-ktx")
+    implementation("com.google.firebase:firebase-firestore-ktx")
+    implementation(platform("com.google.firebase:firebase-bom:33.1.2"))
+    implementation("com.google.firebase:firebase-analytics")
+    implementation("com.google.firebase:firebase-messaging-ktx") // Bildirimler için eklendi
+    implementation("com.google.android.gms:play-services-maps:18.2.0")
+    implementation("com.google.android.gms:play-services-location:21.3.0")
+    implementation("com.google.firebase:firebase-storage-ktx")
     implementation("com.github.bumptech.glide:glide:4.16.0")
 }

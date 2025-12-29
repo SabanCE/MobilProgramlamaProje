@@ -215,7 +215,7 @@ class BildirimEkleActivity : AppCompatActivity() {
     }
 
     private fun veritabaninaKaydet(userId: String, tur: String, baslik: String, aciklama: String, fotoUrl: String?) {
-        val bildirimStatus = if ("Acil Durum".equals(tur, ignoreCase = true)) "ACİL" else "Açık"
+        val bildirimStatus = "Açık" // Varsayılan durum her zaman "Açık" olsun
 
         val bildirim = hashMapOf(
             "type" to tur,
