@@ -70,9 +70,38 @@ Bu uygulama sayesinde öğrenciler kampüs içinde karşılaştıkları probleml
 
 ## 📸 Ekran Görüntüleri
 
-| Ana Ekran (Harita + Liste) | Yeni Bildirim Oluştur | Bildirim Detayı (Admin) |
-| :------------------------: | :-------------------: | :---------------------: |
-|          Ana Ekran         |         Ekleme        |          Detay          |
+Aşağıda uygulamaya ait temel ekran görüntülerini görebilirsiniz:
+
+### 🔐 Giriş / Kayıt Ekranı
+
+![Giriş Ekranı](giris.jpeg)
+
+### 🗺️ Ana Ekran (Harita + Liste)
+
+![Ana Ekran](anaekran.jpeg)
+
+### 📍 Harita Görünümü
+
+![Harita](harita.jpeg)
+
+### ➕ Yeni Bildirim Oluşturma
+
+![Bildirim Detay](bildirimdetay.jpeg)
+
+### 🚨 Acil Durum Bildirimi
+
+![Acil Durum](acildurum.jpeg)
+
+### 🛠️ Admin Paneli
+
+![Admin Paneli](adminpanel.jpeg)
+
+### ⚙️ Ayarlar
+
+![Ayarlar](ayarlar.jpeg)
+
+---:|:---:|:---:|
+| Ana Ekran | Ekleme | Detay |
 
 ---
 
