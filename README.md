@@ -1,68 +1,109 @@
-🛡️ Kampüs İçi Bildirim ve Güvenlik Sistemi
-Kotlin Firebase Android SDK
-Üniversite kampüsleri için geliştirilmiş, sorunların ve acil durumların konum tabanlı olarak raporlanmasını ve yönetilmesini sağlayan modern bir Android uygulamasıdır.
-🚀 Özellikler
-👤 Kullanıcı Özellikleri
-•
-Giriş/Kayıt: Firebase Auth ile güvenli kimlik doğrulama.
-•
-Konum Tabanlı Bildirim: Sorunları (Teknik, Temizlik, Güvenlik vb.) harita üzerinden konum seçerek veya cihaz konumunu kullanarak raporlama.
-•
-Fotoğraf Kanıtı: Bildirimlere Firebase Storage üzerinden fotoğraf ekleyebilme.
-•
-Gerçek Zamanlı Takip: Bildirimlerin durumunu (Açık, İnceleniyor, Çözüldü) anlık olarak izleme.
-•
-Akıllı Filtreleme: Arama çubuğu ve kategorik filtreler (Chip) ile bildirimlere hızlı erişim.
-•
-Kişiselleştirilmiş Bildirim Ayarları: Sadece ilgi duyulan kategorilerdeki bildirimleri ana ekranda görme tercihi.
-🔑 Admin Özellikleri (Rol Tabanlı Yetkilendirme)
-•
-Durum Yönetimi: Bildirimlerin çözüm sürecini anlık olarak güncelleme.
-•
-Acil Durum Yayınlama: Tüm kullanıcılara anlık giden ve ana ekranda sabitlenen kırmızı öncelikli bildirimler oluşturma.
-•
-İçerik Denetimi: Gereksiz veya asılsız bildirimleri sistemden tamamen silebilme.
-•
-Kullanıcı Takibi: Bildirimi oluşturan kullanıcıların detaylarını görüntüleme yetkisi.
-🛠️ Kullanılan Teknolojiler
-•
-Dil: Kotlin
-•
-Veritabanı: Firebase Firestore (NoSQL, Real-time)
-•
-Kimlik Doğrulama: Firebase Auth
-•
-Dosya Saklama: Firebase Storage (Fotoğraflar için)
-•
-Harita Servisleri: Google Maps SDK & Google Play Services Location
-•
-Görsel İşleme: Glide (Resimlerin verimli yüklenmesi ve önbelleğe alınması)
-•
-UI Bileşenleri: Material Design Components, RecyclerView, ViewBinding, ConstraintLayout, Lottie (Opsiyonel)
-📸 Ekran Görüntüleri
-| Ana Ekran (Harita + Liste) | Yeni Bildirim Oluştur | Bildirim Detayı (Admin) | | :---: | :---: | :---: | | Ana Ekran | Ekleme | Detay |
-🏗️ Proje Yapısı
+# 🛡️ Kampüs İçi Bildirim ve Güvenlik Sistemi
+
+Kotlin ve Firebase kullanılarak geliştirilmiş, üniversite kampüsleri için **konum tabanlı sorun ve acil durum bildirimlerini** hızlı ve güvenli şekilde yönetmeyi amaçlayan modern bir Android uygulamasıdır.
+
+Bu uygulama sayesinde öğrenciler kampüs içinde karşılaştıkları problemleri kolayca raporlayabilir, yöneticiler ise bu bildirimleri gerçek zamanlı olarak takip edip yönetebilir.
+
+---
+
+## 🚀 Özellikler
+
+### 👤 Kullanıcı Özellikleri
+
+* **Giriş / Kayıt**
+  Firebase Authentication ile güvenli kullanıcı doğrulama.
+
+* **Konum Tabanlı Bildirim**
+  Teknik, temizlik, güvenlik vb. sorunları harita üzerinden konum seçerek veya cihazın mevcut konumunu kullanarak raporlama.
+
+* **Fotoğraf Kanıtı**
+  Bildirimlere Firebase Storage üzerinden fotoğraf ekleyebilme.
+
+* **Gerçek Zamanlı Takip**
+  Bildirim durumlarını anlık olarak izleme:
+
+  * Açık
+  * İnceleniyor
+  * Çözüldü
+
+* **Akıllı Filtreleme**
+  Arama çubuğu ve kategori bazlı filtreler (Chip) ile bildirimlere hızlı erişim.
+
+* **Kişiselleştirilmiş Bildirimler**
+  Sadece ilgi duyulan kategorilerdeki bildirimleri ana ekranda görme seçeneği.
+
+---
+
+### 🔑 Admin Özellikleri (Rol Tabanlı Yetkilendirme)
+
+* **Durum Yönetimi**
+  Bildirimlerin çözüm sürecini anlık olarak güncelleme.
+
+* **Acil Durum Yayınlama**
+  Tüm kullanıcılara anında iletilen ve ana ekranda sabitlenen kırmızı öncelikli acil durum bildirimleri oluşturma.
+
+* **İçerik Denetimi**
+  Gereksiz veya asılsız bildirimleri sistemden tamamen silme.
+
+* **Kullanıcı Takibi**
+  Bildirimi oluşturan kullanıcıların detaylarını görüntüleme yetkisi.
+
+---
+
+## 🛠️ Kullanılan Teknolojiler
+
+* **Dil:** Kotlin
+* **Veritabanı:** Firebase Firestore (NoSQL, Real-time)
+* **Kimlik Doğrulama:** Firebase Authentication
+* **Dosya Saklama:** Firebase Storage (fotoğraflar için)
+* **Harita Servisleri:** Google Maps SDK & Google Play Services Location
+* **Görsel Yükleme:** Glide
+* **UI Bileşenleri:**
+
+  * Material Design Components
+  * RecyclerView
+  * ViewBinding
+  * ConstraintLayout
+  * Lottie (opsiyonel)
+
+---
+
+## 📸 Ekran Görüntüleri
+
+| Ana Ekran (Harita + Liste) | Yeni Bildirim Oluştur | Bildirim Detayı (Admin) |
+| :------------------------: | :-------------------: | :---------------------: |
+|          Ana Ekran         |         Ekleme        |          Detay          |
+
+---
+
+## 🏗️ Proje Yapısı
+
+```text
 app/src/main/java/com/example/mobilprogramlamaproje/
-├── AnasayfaActivity.kt         # Ana ekran mantığı, filtreleme ve harita
-├── BildirimEkleActivity.kt     # Yeni bildirim oluşturma, konum ve fotoğraf seçimi
-├── NotificationDetailActivity.kt # Bildirim detayları ve admin yönetim araçları
-├── NotificationsAdapter.kt     # Dinamik renklendirme (when bloğu) ve liste yönetimi
-└── Register/LoginActivities.kt # Kimlik doğrulama işlemleri
-⚙️ Kurulum
-1.
-Bu projeyi bilgisayarınıza indirin veya clone'layın.
-2.
-Android Studio ile projeyi açın.
-3.
-Firebase Console üzerinden bir proje oluşturun.
-4.
-google-services.json dosyanızı indirin ve app/ dizinine kopyalayın.
-5.
-Google Cloud Console'dan Maps SDK anahtarınızı alın ve AndroidManifest.xml içine ekleyin:
-Manifest
-<meta-data
-    android:name="com.google.android.geo.API_KEY"
-    android:value="SİZİN_API_ANAHTARINIZ" />
-Merge Into Manifest
-6.
-Projeyi derleyin ve çalıştırın.
+├── AnasayfaActivity.kt              # Ana ekran, filtreleme ve harita işlemleri
+├── BildirimEkleActivity.kt          # Yeni bildirim oluşturma, konum ve fotoğraf seçimi
+├── NotificationDetailActivity.kt    # Bildirim detayları ve admin yönetimi
+├── NotificationsAdapter.kt          # Liste yönetimi ve dinamik renklendirme
+└── Register/LoginActivities.kt      # Kullanıcı kimlik doğrulama işlemleri
+```
+
+---
+
+## ⚙️ Kurulum
+
+1. Bu projeyi bilgisayarınıza **clone** veya **download** edin.
+2. Android Studio ile projeyi açın.
+3. Firebase Console üzerinden yeni bir proje oluşturun.
+4. `google-services.json` dosyasını indirip **app/** dizinine ekleyin.
+5. Google Cloud Console üzerinden **Maps SDK** API anahtarınızı alın ve `AndroidManifest.xml` dosyasına ekleyin.
+6. Projeyi derleyin ve çalıştırın.
+
+---
+
+## 🎯 Amaç
+
+Bu proje, üniversite kampüslerinde güvenliği artırmayı, sorunların hızlı şekilde raporlanmasını ve yönetilmesini sağlamayı hedefler.
+
+---
+
+> 📌 Katkıda bulunmak, öneri sunmak veya geliştirme yapmak için **Pull Request** gönderebilirsiniz.
